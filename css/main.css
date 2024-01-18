@@ -1,0 +1,329 @@
+:root{
+    --text: #76746d;
+    --text-dark: #353532;
+    /* --text-dark: #5c5b56; */
+
+    --primary: #764b92;
+    /* --primary: #fe5969; */
+
+    --action: #b3db24;
+    /* --action: #5ec7c2; */
+
+    --accent: #ff0083;
+    /* --accent: #5ec7c2; */
+
+    --bg-paper: #fefeff;
+
+    --error: #ff0044;
+}
+
+@font-face {
+    font-family: 'HDV';
+    src: url('../fonts/HVD_Comic_Serif_Pro.otf');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: 'Children Sans';
+    src: url('../fonts/ChildrenSans.ttf');
+}
+
+@font-face {
+    font-family: 'Bake Bunny';
+    src: url('../fonts/BakeBunny-Round.otf');
+}
+
+@font-face {
+    font-family: 'KG';
+    src: url('../fonts/KGBlankSpaceSolid.ttf');
+    font-weight: bold;
+}
+
+body{
+    background-color: #4C4F5E;
+    display: grid;
+    margin: 0;
+    padding: 5em 0em;
+
+    background-image: url(../img/tile.png);
+    background-repeat: repeat;
+    background-size: 560px;
+
+    font-family: "Children Sans", sans-serif;
+    font-size: 1.35em;
+    line-height: 1.3;
+    z-index: 0;
+}
+
+h1,h2{
+    margin: 0;
+}
+
+h1{
+    font-family: 'HDV', serif;
+    color: var(--primary);
+    font-size: 1.9em;
+}
+
+h2{
+    font-family: 'KG', sans-serif;
+    font-size: 1.3em;
+    /* opacity: 0.8; */
+    color: var(--text-dark);
+}
+
+p{
+    margin: 0;
+}
+
+nav{
+    display: flex;
+    gap: 2em;
+    font-family: "Bake Bunny", sans-serif;
+}
+
+a{
+    color: var(--action);
+    text-decoration: none;
+    text-shadow: 1px 1px 3px white;
+    position: relative;
+}
+
+a:hover{
+    opacity: 0.5;
+}
+
+a::after{
+    /* Line underneath hyperlink */
+    content: "";
+    opacity: 0;
+    position: absolute;
+    bottom: 0.1em;
+    left: 0;
+    right: 100%;
+    height: 0.1em;
+    border-radius: 0.2em;
+    background-color: var(--action);
+    transition: 0.2s;
+}
+
+a.active::after{
+    opacity: 1;
+    right: 25%;
+}
+
+button{
+    background-color: var(--accent);
+    border: 2px solid var(--accent);
+    padding: 0.4em 1.2em 0.3em 1.2em;
+    color: white;
+    font: inherit;
+    /* font-size: 1.1em; */
+    cursor: pointer;
+    margin-right: auto;
+    font-family: "Bake Bunny", sans-serif;
+    transition: 0.1s;
+    border-radius: 0.5em;
+}
+
+button:hover{
+    background-color: transparent;
+    color: var(--accent);
+}
+
+button:active{
+    transition: 0s;
+    opacity: 0.5;
+    transform: translateY(2px);
+}
+
+.booklet{
+    padding: 2em;
+    padding-top: 68px;
+
+    display: grid;
+    gap: 1em;
+
+    margin: auto;
+    max-width: 800px;
+    width: 100%;
+    /* background-color: rgb(235, 231, 227); */
+    background-color: var(--bg-paper);
+    border-radius: 1.5em;
+    position: relative;
+
+    background-image: url(../img/dot.svg);
+    background-repeat: repeat;
+    background-size: 34px;
+    background-position: top center;
+
+    box-shadow: 0.7em 0.7em 2em rgba(0,0,0,0.4);
+
+    color: var(--text);
+    z-index: 0;
+}
+
+.booklet::before{
+    content: '';
+    position: absolute;
+    top: -26px;
+    right: 20px;
+    left: 20px;
+    height: 72px;
+
+    background-image: url(../img/wire.png);
+    background-repeat: repeat-x;
+    background-size: contain;
+    background-position: center;
+}
+
+.booklet h1{
+}
+
+.hero{
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    /* gap: 1em; */
+    align-items: flex-start;
+}
+
+.hero .hero-text{
+    display: grid;
+    gap: 1em;
+}
+
+.hero .hero-text .title{
+    display: grid;
+    gap: 0.4em;
+}
+
+.hero .hero-img{
+    display: grid;
+    align-items: center;
+}
+
+.hero .hero-img img{
+    display: block;
+    width: 100%;
+    filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.25));
+}
+
+.hero h1{
+    font-size: 2.4em;
+}
+
+.booklet nav{
+    justify-content: end;
+}
+
+.booklet .about{
+    display: grid;
+    gap: 1.5em;
+}
+
+.booklet .about>div{
+    display: grid;
+    gap: 0.5em;
+}
+
+.booklet .about h1{
+    font-size: 1.9em;
+}
+
+/* Authentication */
+.auth{
+    display: grid;
+    gap: 2em;
+    align-items: flex-start;
+    grid-template-columns: 1fr 1.1fr;
+}
+
+.auth .auth-img{
+    display: block;
+    width: 100%;
+    filter: drop-shadow(1px 2px 1px rgba(0,0,0,0.25));
+}
+
+.auth .auth-form{
+    display: grid;
+    gap: 1em;
+}
+
+.auth .inputs{
+    display: grid;
+    gap: 0.5em;
+}
+
+.auth .input-field{
+    display: grid;
+    position: relative;
+}
+
+.auth .field-icon{
+    position: absolute;
+    top: 50%;
+    left: 0.5em;
+    font-size: 1em;
+    color: rgba(0,0,0,0.5);
+    z-index: 1;
+    width: 1.4em;
+    transform: translateY(-50%);
+    opacity: 0.2;
+    pointer-events: none;
+    image-rendering: pixelated;
+    user-select: none;
+}
+
+input[type="text"], input[type="password"]{
+    padding: 0.4em 0.5em;
+    border: 2px solid rgba(0,0,0,0.1);
+    background: transparent;
+    backdrop-filter: blur(2px);
+    border-radius: 0.5em;
+    font: inherit;
+    font-size: 1.1em;
+    outline: none;
+    transition: 0.2s;
+    padding-left: 2.2em;
+}
+
+input[type="text"]:focus, input[type="password"]:focus{
+    transition: 0s;
+    border-color: rgba(0,0,0,0.3);
+}
+
+input[type="text"]::placeholder, input[type="password"]::placeholder{
+    color: rgba(0,0,0,0.7);
+}
+
+.auth .tos{
+    display: flex;
+    gap: 0.5em;
+    align-items: center;
+    font-size: 0.9em;
+    color: rgba(0,0,0,0.6);
+}
+
+.auth .auth-form .desc{
+    display: grid;
+    gap: 0.5em;
+}
+
+.msg{
+    display: flex;
+    gap: 0.4em;
+    align-items: center;
+    font-size: 0.9em;
+    color: white;
+    background-color: var(--error);
+    padding: 0.3em;
+    overflow: hidden;
+    border-radius: 0.4em;
+}
+
+.msg .msg-icon{
+    width: 1.2em;
+    filter: invert(1);
+    user-select: none;
+    image-rendering: pixelated;
+}
