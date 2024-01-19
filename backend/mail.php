@@ -8,10 +8,10 @@
  * 
  * Mail templates are stored in the mail_templates folder.
  */
-require 'keys.php';
-require 'php_mailer/PHPMailer.php';
-require 'php_mailer/SMTP.php';
-require 'php_mailer/Exception.php'; 
+require_once('keys.php');
+require_once('php_mailer/PHPMailer.php');
+require_once('php_mailer/SMTP.php');
+require_once('php_mailer/Exception.php'); 
 
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
@@ -39,19 +39,21 @@ class Mailer{
         $this->mail->isHTML(true);
     }
 
-    public function sendConfirmCode($code) {
+    public function send_confirmation_code($code) {
         try {
             // Load the template
             $template = file_get_contents(EmailTemplates::CONFIRMATION_TEMPLATE);
             $template = str_replace('{{code}}', $code, $template);
+            $template = str_replace('{{year}}', date('Y'), $template);
 
             // Set email content
             $this->mail->Subject = 'Your Confirmation Code';
             $this->mail->Body = $template;
             $this->mail->send();
-            echo 'Confirmation email has been sent';
+            return true;
         } catch (Exception $e) {
-            echo "Confirmation email could not be sent. Mailer Error: {$this->mail->ErrorInfo}";
+            // echo "Confirmation email could not be sent. Mailer Error: {$this->mail->ErrorInfo}";
+            return false;
         }
     }
 }
@@ -62,10 +64,6 @@ class Mailer{
 class EmailTemplates {
     const CONFIRMATION_TEMPLATE = 'mail_templates/confirm_code.html';
 }
-
-// Test
-$mailer = new Mailer(TEST_EMAIL);
-$mailer->sendConfirmCode("TRUDDY SUPREMACY!");
 
 ?>
 
