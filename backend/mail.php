@@ -62,7 +62,8 @@ class Mailer{
  * Class EmailTemplates that contains the paths to the email templates
  */
 class EmailTemplates {
-    const CONFIRMATION_TEMPLATE = 'mail_templates/confirm_code.html';
+    private const BASE = DOC_ROOT."backend/mail_templates/";
+    const CONFIRMATION_TEMPLATE = self::BASE."confirm_code.html";
 }
 
 ?>
