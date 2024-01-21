@@ -76,6 +76,10 @@ p{
     margin: 0;
 }
 
+.hidden{
+    display: none !important;
+}
+
 nav{
     display: flex;
     gap: 2em;
@@ -87,6 +91,7 @@ a{
     text-decoration: none;
     text-shadow: 1px 1px 3px white;
     position: relative;
+    cursor: pointer;
 }
 
 a:hover{
@@ -135,6 +140,28 @@ button:active{
     transition: 0s;
     opacity: 0.5;
     transform: translateY(2px);
+}
+
+.flex-inline{
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.flex-inline .end{
+    margin-left: auto;
+}
+
+.clickable-small{
+    cursor: pointer;
+    font-size: 0.8em;
+    opacity: 0.5;
+    transition: 0.1s;
+}
+
+.clickable-small:hover{
+    opacity: 0.7;
+    text-decoration: underline;
 }
 
 .booklet{
@@ -238,10 +265,15 @@ button:active{
     grid-template-columns: 1fr 1.1fr;
 }
 
+.auth.reverse{
+    grid-template-columns: 1.1fr 1fr;
+}
+
 .auth .auth-img{
     display: block;
     width: 100%;
     filter: drop-shadow(1px 2px 1px rgba(0,0,0,0.25));
+    transition: 0.3s;
 }
 
 .auth .auth-form{
@@ -249,17 +281,71 @@ button:active{
     gap: 1em;
 }
 
+.auth .auth-form .desc{
+    display: grid;
+    gap: 0.5em;
+}
+
 .auth .inputs{
     display: grid;
     gap: 0.5em;
 }
 
-.auth .input-field{
+.auth .inputs{
+    display: grid;
+    gap: 0.5em;
+}
+
+/* Auth transition animations */
+.auth,
+.auth-form{
+    transition: 0.3s opacity, 0.3s scale;
+}
+
+.auth.fade-hide,
+.auth-form.fade-hide{
+    opacity: 0;
+    scale: 0.98;
+}
+
+.auth.fade-show,
+.auth-form.fade-show{
+    opacity: 1;
+    scale: 1;
+}
+
+.auth.fade-hide .auth-img{
+    transform: translateX(2em);
+}
+
+.auth.reverse.fade-hide .auth-img{
+    transform: translateX(-2em);
+}
+
+.auth.fade-show .auth-img,
+.auth.reverse.fade-show .auth-img{
+    transform: translateX(0em);
+}
+
+/* Input fields */
+.input{
+    display: grid;
+}
+
+.input .input-field{
     display: grid;
     position: relative;
 }
 
-.auth .field-icon{
+.input.input-checkbox .input-field{
+    display: flex;
+    gap: 0.5em;
+    align-items: center;
+    font-size: 0.9em;
+    color: rgba(0,0,0,0.6);
+}
+
+.input .input-field .field-icon{
     position: absolute;
     top: 50%;
     left: 0.5em;
@@ -270,11 +356,10 @@ button:active{
     transform: translateY(-50%);
     opacity: 0.2;
     pointer-events: none;
-    image-rendering: pixelated;
     user-select: none;
 }
 
-input[type="text"], input[type="password"]{
+.input input{
     padding: 0.4em 0.5em;
     border: 2px solid rgba(0,0,0,0.1);
     background: transparent;
@@ -287,43 +372,71 @@ input[type="text"], input[type="password"]{
     padding-left: 2.2em;
 }
 
-input[type="text"]:focus, input[type="password"]:focus{
-    transition: 0s;
+.input input:focus{
     border-color: rgba(0,0,0,0.3);
 }
 
-input[type="text"]::placeholder, input[type="password"]::placeholder{
+.input input::placeholder{
     color: rgba(0,0,0,0.7);
 }
 
-.auth .tos{
-    display: flex;
-    gap: 0.5em;
-    align-items: center;
-    font-size: 0.9em;
-    color: rgba(0,0,0,0.6);
+.input.error input{
+    border-color: var(--error);
+    border-radius: 0.5em 0.5em 0 0;
 }
 
-.auth .auth-form .desc{
-    display: grid;
-    gap: 0.5em;
+.input .input-desc{
+    font-size: 0.8em;
+    color: rgba(0,0,0,0.3);
+    margin: 0.5em;
 }
 
-.msg{
+.input .input-msg{
     display: flex;
-    gap: 0.4em;
-    align-items: center;
+    gap: 0.5em;
+    align-items: flex-start;
     font-size: 0.9em;
     color: white;
     background-color: var(--error);
-    padding: 0.3em;
+    padding: 0 0.4em;
     overflow: hidden;
-    border-radius: 0.4em;
+    border-radius: 0 0 0.5em 0.5em;
+
+    height: 0;
+    opacity: 0;
+    margin-top: 2px;
+    transform: translateY(-4px);
+
+    transition: 0.5s opacity, 0.3s transform cubic-bezier(0.215, 0.610, 0.355, 1);
 }
 
-.msg .msg-icon{
-    width: 1.2em;
+.input.error .input-msg{
+    padding: 0.4em;
+    height: auto;
+    opacity: 1;
+    transform: translateY(0);
+    cursor: pointer;
+}
+
+.input.input-checkbox.error .input-msg{
+    margin-top: 5px;
+    border-radius: 0.5em 0.5em;
+}
+
+.input .input-msg .msg-icon{
+    width: 1.1em;
     filter: invert(1);
     user-select: none;
-    image-rendering: pixelated;
+}
+
+.input .input-field.shake{
+    animation: horizontalShake 0.3s;
+}
+
+@keyframes horizontalShake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-3px); }
+    40% { transform: translateX(3px); }
+    60% { transform: translateX(-2px); }
+    80% { transform: translateX(2px); }
 }

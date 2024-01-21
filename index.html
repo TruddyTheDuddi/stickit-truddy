@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/main.css">
+    <script src="js/ajax.js"></script>
+    <script src="js/index.js" defer></script>
+    <script src="js/global.js" defer></script>
     <title>Booklet</title>
 </head>
 <body>
@@ -30,9 +33,10 @@
             </div>
         </div>
 
-        <div class="auth">
-            <div class="auth-form">
-                <h1>Sign up</h1>
+        <div class="auth" id="auth-email">
+            <!-- Send email -->
+            <div class="auth-form" id="auth-email-send">
+                <h1>Sign up!</h1>
 
                 <div class="desc">
                     <div>Hey there, future sticker master!</div>
@@ -40,29 +44,137 @@
                 </div>
 
                 <div class="inputs">
-                    <div class="input-field">
-                        <img src="img/icon/icon_email.png" class="field-icon">
-                        <input type="text" placeholder="Email">
+                    
+                    <div class="input" id="test">
+                        <div class="input-field">
+                            <img src="img/icon/icon_email.png" class="field-icon">
+                            <input type="text" placeholder="Email" autocomplete="off" name="email">
+                        </div>
+                        <div class="input-desc">
+                            I'll only send you the confirmation code, and password reset emails.
+                        </div>
                     </div>
+                    
+                </div>
+
+
+                <div class="input input-checkbox" id="t">
                     <div class="input-field">
-                        <img src="img/icon/icon_code.png" class="field-icon">
-                        <input type="text" placeholder="Confirmation code">
+                        <input type="checkbox" name="tos" autocomplete="off">
+                        <span>I pledge to honor the <a>Sticker Collector's Code.</a></span>
                     </div>
                 </div>
 
-                <div class="msg">
-                    <img src="img/icon/icon_warn.png" class="msg-icon">
-                    <span>Invalid email address.</span>
+                <div class="flex-inline">
+                    <button>Send</button>
+                    <span class="clickable-small end" id="auth-email-skip">I already have a code &gt</span>
                 </div>
-
-                <div class="tos">
-                    <input type="checkbox" name="" id="">
-                    <span>I pledge to honor the <a>Sticker Collector's Code.</a></span>
-                </div>
-
-                <button>Send</button>
             </div>
+
+            <!-- Enter code -->
+            <div class="auth-form hidden" id="auth-email-code">
+                <h1>Email sent!</h1>
+
+                <div class="desc">
+                    <div>Dash over to your inbox! You should find an email from me.</div>
+                    <div>I've sent it to: <a id="targetEmail">{{email}}</a></div>
+                </div>
+
+                <div class="inputs">
+                    <div class="input">
+                        <div class="input-field">
+                            <img src="img/icon/icon_code.png" class="field-icon">
+                            <input type="text" placeholder="Confirmation code" name="code" autocomplete="off">
+                        </div>
+                        <div class="input-desc">
+                            If it's playing hide and seek (sometimes emails do that), wait a bit, then check your spam or promotions folder!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-inline">
+                    <button>Check code</button>
+                    <span class="clickable-small end" id="auth-code-back">&lt Go back</span>
+                </div>
+            </div>
+
+
+            <!-- Enter code with email -->
+            <div class="auth-form hidden" id="auth-email-code-old">
+                <h1>Already got a code?</h1>
+
+                <div class="desc">
+                    <div>Dash over to your inbox and enter it below, alongside your email!</div>
+                </div>
+
+                <div class="inputs">
+
+                    <div class="input">
+                        <div class="input-field">
+                            <img src="img/icon/icon_email.png" class="field-icon">
+                            <input type="text" placeholder="Email address" name="email" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="input">
+                        <div class="input-field">
+                            <img src="img/icon/icon_code.png" class="field-icon">
+                            <input type="text" placeholder="Confirmation code" name="code" autocomplete="off">
+                        </div>
+                        <div class="input-desc">
+                            If it's playing hide and seek (sometimes emails do that), wait a bit, then check your spam or promotions folder!
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="flex-inline">
+                    <button>Check code</button>
+                    <span class="clickable-small end" id="auth-code-email-back">&lt Go back</span>
+                </div>
+            </div>
+
             <img src="img/truddy_auth.png" alt="" class="auth-img">
+        </div>
+
+        <!-- Username & Password -->
+        <div class="auth reverse hidden" id="auth-credentials">
+            <img src="img/truddy_auth2.png" alt="" class="auth-img">
+            <div class="auth-form" id="auth-cred">
+                <h1>Beep boop, code confirmed!</h1>
+
+                <div class="desc">
+                    <div>Gotcha! Now, let's get you set up. Identity and security:</div>
+                    <!-- <div>Let's add some sparkles and make your account fabulous!</div> -->
+                </div>
+
+                <div class="inputs">
+                    <div class="input">
+                        <div class="input-field">
+                            <img src="img/icon/icon_user.png" class="field-icon">
+                            <input type="text" placeholder="Username" name="username" autocomplete="off">
+                        </div>
+                        <div class="input-desc">
+                            Between 4 and 16 characters, only letters, numbers, dashes - and underscores _
+                        </div>
+                    </div>
+                    
+                    <div class="input">
+                        <div class="input-field">
+                            <img src="img/icon/icon_psw.png" class="field-icon">
+                            <input type="password" placeholder="Password" name="password">
+                        </div>
+                    </div>
+                    <div class="input">
+                        <div class="input-field">
+                            <img src="img/icon/icon_psw.png" class="field-icon">
+                            <input type="password" placeholder="Confirm password" name="password_confirm">
+                        </div>
+                    </div>
+                </div>
+
+                <button>Create!</button>
+            </div>
         </div>
         
         <div class="about" style="display: none;">
