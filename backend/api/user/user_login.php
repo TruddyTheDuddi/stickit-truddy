@@ -39,4 +39,12 @@ LoggedUser::set($logged_user->id);
 $ip = make_sql_safe(md5($_SERVER['REMOTE_ADDR']));
 $sql = "INSERT INTO user_logins (user_id, ip_addr) VALUES ($logged_user->id, '$ip')";
 mysqli_query($db, $sql);
+
+$json->success("Eyy, login successful, welcome back!");
+$json->add_field("user", array(
+    "id" => $logged_user->id,
+    "username" => $logged_user->username,
+    "avatar" => $logged_user->avatar,
+    "role" => $logged_user->role,
+));
 ?>
