@@ -3,8 +3,6 @@
 include_once("../../tools.php");
 $json = new JSON_Resp();
 
-// The validator ID is a random string that is linked to an email confirmation,
-// and we use it to trace back to the initial email address.
 validate_params(array("username", "password", "email"), $_GET);
 $username = $_GET["username"];
 $password = $_GET["password"];
