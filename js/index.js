@@ -1,3 +1,18 @@
+const PAGES = {
+    create: document.getElementById("create-account"),
+    login: document.getElementById("login"),
+}
+
+// Setup page navigation, with callback to make sure the page change between create and login is handled
+setupNav(document.getElementById("booklet-nav"), (hash) => {
+    console.log("Hash changed to", hash);
+    if(hash == "#create-account"){
+        currentPage = PAGES.create;
+    } else if (hash == "#login") {
+        currentPage = PAGES.login;
+    }
+});
+
 /**
  * Gather the input fields given an element (panel)
  * and return 2 objects: one with the data, one with 
@@ -203,6 +218,67 @@ let createSteps = {
     }
 }
 
+let loginSteps = {
+    // Enter credentials
+    login: {
+        panel: document.getElementById("auth-login"),
+        subPanel: document.getElementById("auth-login-cred"),
+        skip: document.getElementById("auth-login-forgot-go"),
+        submit: function() {
+            let { data, elements } = gatherInputs(loginSteps.login.subPanel);
+
+            // No username entered
+            if(data.username.length == 0) {
+                elements.username.showError("Hello, who's this? Enter a username please!");
+                return;
+            }
+
+            // No password entered
+            if(data.password.length == 0) {
+                elements.password.showError("Right, that's a great password. Now put something in the field please.");
+                return;
+            }
+
+            AJAX.get("backend/api/user/user_login.php", {
+                success: (data) => {
+                    if(data.success){
+                        console.log(data);
+                    } else {
+                        if(data.status == "username"){
+                            elements.username.showError(data.msg);
+                        } else if(data.status == "password") {
+                            elements.password.showError(data.msg);
+                        } else {
+                            console.error(data);
+                        }
+                    }
+                }
+            }, data);
+        }
+    },
+
+    // Forgot password
+    forgot: {
+        panel: document.getElementById("auth-login"),
+        subPanel: document.getElementById("auth-login-forgot"),
+        skip: document.getElementById("auth-login-back"),
+        submit: function() {
+            let { data, elements } = gatherInputs(loginSteps.forgot.subPanel);
+
+            elements.email.showError("Sorry this feature is not available yet.");
+            return;
+
+            // Email regex validation
+            if(!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(data.email)) {
+                elements.email.showError("This doesn't look like a valid email address to me. Please try another one!");
+                return;
+            }
+        }
+    }
+
+};
+
+// Needed to store data between account creation steps
 let createData = {
     userId: null,
     email: null,
@@ -211,7 +287,7 @@ let createData = {
     password: null
 }
 
-// Link the steps together
+// Link the create account steps together 
 createSteps.email.next = createSteps.code;
 createSteps.email.nextSkip = createSteps.codeAndEmail;
 
@@ -224,44 +300,68 @@ createSteps.codeAndEmail.nextSkip = createSteps.email; // Going back
 createSteps.credentials.next = createSteps.avatar;
 createSteps.avatar.next = null;
 
-// For each step, add a submit event listener
-for (let step in createSteps) {
-    console.log(step);
+// Link the login steps together
+loginSteps.login.next = null;
+loginSteps.login.nextSkip = loginSteps.forgot;
 
-    // The button is in the subPanel, it there's none of that, it's in the panel
-    let button;
-    if(createSteps[step].subPanel != null) {
-        button = createSteps[step].subPanel.querySelector("button");
-    } else {
-        if(createSteps[step].panel != null) {
-            button = createSteps[step].panel.querySelector("button");
+loginSteps.forgot.next = null;
+loginSteps.forgot.nextSkip = loginSteps.login;
+
+// For each step, add a submit event listener for create account and login
+[createSteps, loginSteps].forEach(steps => {
+    for (let step in steps) {
+        console.log(step);
+
+        // The button is in the subPanel, it there's none of that, it's in the panel
+        let button;
+        if(steps[step].subPanel != null) {
+            button = steps[step].subPanel.querySelector("button");
         } else {
-            // Debug for now, should never happen
-            console.log("No panel or subPanel for step " + step);
-            continue;
+            if(steps[step].panel != null) {
+                button = steps[step].panel.querySelector("button");
+            } else {
+                // Debug for now, should never happen
+                console.log("No panel or subPanel for step " + step);
+                continue;
+            }
+        }
+        
+        // Add the event listener, activate submit
+        button.addEventListener("click", steps[step].submit);
+
+        // If there is a goto button, add the event listener, and go there
+        if(steps[step].skip != null) {
+            steps[step].skip.addEventListener("click", () => {
+                goTo(steps[step].nextSkip);
+            });
         }
     }
-    
-    // Add the event listener, activate submit
-    button.addEventListener("click", createSteps[step].submit);
+});
 
-    // If there is a goto button, add the event listener, and go there
-    if(createSteps[step].skip != null) {
-        createSteps[step].skip.addEventListener("click", () => {
-            goTo(createSteps[step].nextSkip);
-        });
-    }
+// Keep track of the current page for both create and login
+let currentStep = {
+    "create": createSteps.email,
+    "login": loginSteps.login
 }
-
-let currentStep = createSteps.email;
 
 /**
  * Go to a step
- * @param {*} to 
+ * @param {*} to
  */
 function goTo(to){
-    switchStep(currentStep, to);
-    currentStep = to;
+    console.log("To:", to);
+    // Get previous step's page
+    let current = null;
+    if(currentPage == PAGES.create){
+        current = "create";
+    } else if (currentPage == PAGES.login) {
+        current = "login";
+    } else {
+        return;
+    }
+
+    switchStep(currentStep[current], to);
+    currentStep[current] = to;
 
     /**
      * Switches from one step to another (helper function)
@@ -308,5 +408,3 @@ function goTo(to){
         }, animDuration);
     }
 }
-
-// goTo(createSteps.credentials);

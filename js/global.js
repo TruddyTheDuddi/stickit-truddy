@@ -1,3 +1,8 @@
+const PAGE_ROOT = "http://localhost:8888/booklet/";
+const UTILTY_PAGES = {
+    "error_404": PAGE_ROOT + "404.html",
+}
+
 /**
  * Create an element but on steroids
  * @param {*} tag 
@@ -14,6 +19,83 @@ function createEl(tag, props) {
         }
     }
     return el;
+}
+
+/**
+ *
+ * @param {*} nav element containing <a>'s to setup
+ * @param {*} callback to provide that will trigger when page 
+ *  changes with the hash as the argument
+ */
+function setupNav(nav, callback = null){
+    let content = {};
+
+    // Grab all the nav items
+    nav.querySelectorAll("a").forEach(item => {
+        let hash = item.getAttribute("href");
+        // Log the item
+        content[hash] = {
+            a: item,
+            hash: item.getAttribute("href"),
+            page: document.querySelector(item.getAttribute("href")),
+        };
+
+        // Add click event for transition
+        item.addEventListener("click", (e) => {
+            e.preventDefault();
+            
+            // Set hash without triggering the hashchange event
+            history.pushState(null, null, hash);
+            
+            // Smooth scroll to top
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+            });
+            transitionPage(hash);
+        });
+    });
+
+    // Grab default either from hash or first item
+    let defaultPage = window.location.hash ? window.location.hash : Object.keys(content)[0];
+
+    if(!content[defaultPage]){
+        // If the page does not exist, go to 404
+        window.location.href = UTILTY_PAGES.error_404;        
+    }
+    transitionPage(defaultPage);
+
+    // Transition to the page when the hash changes
+    window.addEventListener("hashchange", () => {
+        if(content[window.location.hash]) {
+            transitionPage(window.location.hash);
+        } else {
+            // If the page does not exist, go to 404
+            window.location.href = UTILTY_PAGES.error_404;
+        }
+    });
+
+    
+    /**
+     * Transition to a page
+     * @param {*} hash 
+     */
+    function transitionPage(hash){
+        // When clicked, remove the active class from all items and hide all pages
+        for(let key in content){
+            content[key].a.classList.remove("active");
+            content[key].page.classList.add("hidden");
+        }
+        // Then add it to the clicked item
+        content[hash].a.classList.add("active");
+        // And show the corresponding page
+        content[hash].page.classList.remove("hidden");
+
+        // Trigger the callback if provided
+        if(callback){
+            callback(hash);
+        }
+    }
 }
 
 

@@ -5,19 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/main.css">
     <script src="js/ajax.js"></script>
-    <script src="js/index.js" defer></script>
     <script src="js/global.js" defer></script>
+    <script src="js/index.js" defer></script>
     <title>Booklet</title>
 </head>
 <body>
     
     <div class="booklet">
-        <nav>
-            <a href="">Home</a>
-            <a href="">About</a>
-            <a href="" class="active">Login</a>
+        <nav id="booklet-nav">
+            <a href="#home" class="active">Home</a>
+            <a href="#about">About</a>
+            <a href="#login" class="end">Login</a>
+            <a href="#create-account">Sign up</a>
         </nav>
-        <div class="hero" style="display: none;">
+
+        <!-- Home -->
+        <div id="home" class="hero hidden">
             <div class="hero-text">
                 <div class="title">
                     <h1>Stickit' Truddy!</h1>
@@ -33,151 +36,217 @@
             </div>
         </div>
 
-        <div class="auth" id="auth-email">
-            <!-- Send email -->
-            <div class="auth-form" id="auth-email-send">
-                <h1>Sign up!</h1>
+        <!-- Login -->
+        <div id="login" class="hidden">
+            <div class="auth" id="auth-login">
+                <!-- Credentials -->
+                <div class="auth-form" id="auth-login-cred">
+                    <h1>Log in!</h1>
 
-                <div class="desc">
-                    <div>Hey there, future sticker master!</div>
-                    <div>I just need your email address to create your account. I'll be sending a super-secret code to confirm it's really you.</div>
+                    <div class="desc">
+                        <div>Please enter your username and password to access your account</div>
+                    </div>
+
+                    <div class="inputs">
+                        <div class="input">
+                            <div class="input-field">
+                                <img src="img/icon/icon_user.png" class="field-icon">
+                                <input type="text" placeholder="Username" name="username" autocomplete="off">
+                            </div>
+                        </div>
+                        
+                        <div class="input">
+                            <div class="input-field">
+                                <img src="img/icon/icon_psw.png" class="field-icon">
+                                <input type="password" placeholder="Password" name="password">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="flex-inline">
+                        <button>Log in!</button>
+                        <span class="clickable-small end" id="auth-login-forgot-go">Forgot password?</span>
+                    </div>
                 </div>
 
-                <div class="inputs">
-                    
-                    <div class="input" id="test">
-                        <div class="input-field">
-                            <img src="img/icon/icon_email.png" class="field-icon">
-                            <input type="text" placeholder="Email" autocomplete="off" name="email">
-                        </div>
-                        <div class="input-desc">
-                            I'll only send you the confirmation code, and password reset emails.
+                <!-- Forgot password -->
+                <div class="auth-form hidden" id="auth-login-forgot">
+                    <h1>Forgot your password?</h1>
+
+                    <div class="desc">
+                        <div>Don't worry, it happens to the best of us.</div>
+                        <div>Just enter your email address below, and I'll send you a link to reset your password.</div>
+                    </div>
+
+                    <div class="inputs">
+                        <div class="input">
+                            <div class="input-field">
+                                <img src="img/icon/icon_email.png" class="field-icon">
+                                <input type="text" placeholder="Email address" name="email" autocomplete="off">
+                            </div>
                         </div>
                     </div>
-                    
-                </div>
 
-
-                <div class="input input-checkbox" id="t">
-                    <div class="input-field">
-                        <input type="checkbox" name="tos" autocomplete="off">
-                        <span>I pledge to honor the <a>Sticker Collector's Code.</a></span>
+                    <div class="flex-inline">
+                        <button>Send</button>
+                        <span class="clickable-small end" id="auth-login-back">&lt Go back</span>
                     </div>
                 </div>
 
-                <div class="flex-inline">
-                    <button>Send</button>
-                    <span class="clickable-small end" id="auth-email-skip">I already have a code &gt</span>
-                </div>
+                <img src="img/truddy_auth2.png" class="auth-img">
             </div>
-
-            <!-- Enter code -->
-            <div class="auth-form hidden" id="auth-email-code">
-                <h1>Email sent!</h1>
-
-                <div class="desc">
-                    <div>Dash over to your inbox! You should find an email from me.</div>
-                    <div>I've sent it to: <a id="targetEmail">{{email}}</a></div>
-                </div>
-
-                <div class="inputs">
-                    <div class="input">
-                        <div class="input-field">
-                            <img src="img/icon/icon_code.png" class="field-icon">
-                            <input type="text" placeholder="Confirmation code" name="code" autocomplete="off">
-                        </div>
-                        <div class="input-desc">
-                            If it's playing hide and seek (sometimes emails do that), wait a bit, then check your spam or promotions folder!
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex-inline">
-                    <button>Check code</button>
-                    <span class="clickable-small end" id="auth-code-back">&lt Go back</span>
-                </div>
-            </div>
-
-
-            <!-- Enter code with email -->
-            <div class="auth-form hidden" id="auth-email-code-old">
-                <h1>Already got a code?</h1>
-
-                <div class="desc">
-                    <div>Dash over to your inbox and enter it below, alongside your email!</div>
-                </div>
-
-                <div class="inputs">
-
-                    <div class="input">
-                        <div class="input-field">
-                            <img src="img/icon/icon_email.png" class="field-icon">
-                            <input type="text" placeholder="Email address" name="email" autocomplete="off">
-                        </div>
-                    </div>
-
-                    <div class="input">
-                        <div class="input-field">
-                            <img src="img/icon/icon_code.png" class="field-icon">
-                            <input type="text" placeholder="Confirmation code" name="code" autocomplete="off">
-                        </div>
-                        <div class="input-desc">
-                            If it's playing hide and seek (sometimes emails do that), wait a bit, then check your spam or promotions folder!
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="flex-inline">
-                    <button>Check code</button>
-                    <span class="clickable-small end" id="auth-code-email-back">&lt Go back</span>
-                </div>
-            </div>
-
-            <img src="img/truddy_auth.png" alt="" class="auth-img">
         </div>
 
-        <!-- Username & Password -->
-        <div class="auth reverse hidden" id="auth-credentials">
-            <img src="img/truddy_auth2.png" alt="" class="auth-img">
-            <div class="auth-form" id="auth-cred">
-                <h1>Beep boop, code confirmed!</h1>
+        <!-- Create account -->
+        <div id="create-account" class="hidden">
+            <div class="auth" id="auth-email">
+                <!-- Send email -->
+                <div class="auth-form" id="auth-email-send">
+                    <h1>Sign up!</h1>
 
-                <div class="desc">
-                    <div>Gotcha! Now, let's get you set up. Identity and security:</div>
-                    <!-- <div>Let's add some sparkles and make your account fabulous!</div> -->
+                    <div class="desc">
+                        <div>Hey there, future sticker master!</div>
+                        <div>I just need your email address to create your account. I'll be sending a super-secret code to confirm it's really you.</div>
+                    </div>
+
+                    <div class="inputs">
+                        
+                        <div class="input" id="test">
+                            <div class="input-field">
+                                <img src="img/icon/icon_email.png" class="field-icon">
+                                <input type="text" placeholder="Email" autocomplete="off" name="email">
+                            </div>
+                            <div class="input-desc">
+                                I'll only send you the confirmation code, and password reset emails.
+                            </div>
+                        </div>
+                        
+                    </div>
+
+
+                    <div class="input input-checkbox" id="t">
+                        <div class="input-field">
+                            <input type="checkbox" name="tos" autocomplete="off">
+                            <span>I pledge to honor the <a>Sticker Collector's Code.</a></span>
+                        </div>
+                    </div>
+
+                    <div class="flex-inline">
+                        <button>Send</button>
+                        <span class="clickable-small end" id="auth-email-skip">I already have a code &gt</span>
+                    </div>
                 </div>
 
-                <div class="inputs">
-                    <div class="input">
-                        <div class="input-field">
-                            <img src="img/icon/icon_user.png" class="field-icon">
-                            <input type="text" placeholder="Username" name="username" autocomplete="off">
-                        </div>
-                        <div class="input-desc">
-                            Between 4 and 16 characters, only letters, numbers, dashes - and underscores _
+                <!-- Enter code -->
+                <div class="auth-form hidden" id="auth-email-code">
+                    <h1>Email sent!</h1>
+
+                    <div class="desc">
+                        <div>Dash over to your inbox! You should find an email from me.</div>
+                        <div>I've sent it to: <a id="targetEmail">{{email}}</a></div>
+                    </div>
+
+                    <div class="inputs">
+                        <div class="input">
+                            <div class="input-field">
+                                <img src="img/icon/icon_code.png" class="field-icon">
+                                <input type="text" placeholder="Confirmation code" name="code" autocomplete="off">
+                            </div>
+                            <div class="input-desc">
+                                If it's playing hide and seek (sometimes emails do that), wait a bit, then check your spam or promotions folder!
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="input">
-                        <div class="input-field">
-                            <img src="img/icon/icon_psw.png" class="field-icon">
-                            <input type="password" placeholder="Password" name="password">
-                        </div>
-                    </div>
-                    <div class="input">
-                        <div class="input-field">
-                            <img src="img/icon/icon_psw.png" class="field-icon">
-                            <input type="password" placeholder="Confirm password" name="password_confirm">
-                        </div>
+
+                    <div class="flex-inline">
+                        <button>Check code</button>
+                        <span class="clickable-small end" id="auth-code-back">&lt Go back</span>
                     </div>
                 </div>
 
-                <button>Create!</button>
+
+                <!-- Enter code with email -->
+                <div class="auth-form hidden" id="auth-email-code-old">
+                    <h1>Already got a code?</h1>
+
+                    <div class="desc">
+                        <div>Dash over to your inbox and enter it below, alongside your email!</div>
+                    </div>
+
+                    <div class="inputs">
+
+                        <div class="input">
+                            <div class="input-field">
+                                <img src="img/icon/icon_email.png" class="field-icon">
+                                <input type="text" placeholder="Email address" name="email" autocomplete="off">
+                            </div>
+                        </div>
+
+                        <div class="input">
+                            <div class="input-field">
+                                <img src="img/icon/icon_code.png" class="field-icon">
+                                <input type="text" placeholder="Confirmation code" name="code" autocomplete="off">
+                            </div>
+                            <div class="input-desc">
+                                If it's playing hide and seek (sometimes emails do that), wait a bit, then check your spam or promotions folder!
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="flex-inline">
+                        <button>Check code</button>
+                        <span class="clickable-small end" id="auth-code-email-back">&lt Go back</span>
+                    </div>
+                </div>
+
+                <img src="img/truddy_auth.png" alt="" class="auth-img">
+            </div>
+
+            <!-- Username & Password -->
+            <div class="auth reverse hidden" id="auth-credentials">
+                <img src="img/truddy_auth2.png" alt="" class="auth-img">
+                <div class="auth-form" id="auth-cred">
+                    <h1>Beep boop, code confirmed!</h1>
+
+                    <div class="desc">
+                        <div>Gotcha! Now, let's get you set up. Identity and security:</div>
+                        <!-- <div>Let's add some sparkles and make your account fabulous!</div> -->
+                    </div>
+
+                    <div class="inputs">
+                        <div class="input">
+                            <div class="input-field">
+                                <img src="img/icon/icon_user.png" class="field-icon">
+                                <input type="text" placeholder="Username" name="username" autocomplete="off">
+                            </div>
+                            <div class="input-desc">
+                                Between 4 and 16 characters, only letters, numbers, dashes - and underscores _
+                            </div>
+                        </div>
+                        
+                        <div class="input">
+                            <div class="input-field">
+                                <img src="img/icon/icon_psw.png" class="field-icon">
+                                <input type="password" placeholder="Password" name="password">
+                            </div>
+                        </div>
+                        <div class="input">
+                            <div class="input-field">
+                                <img src="img/icon/icon_psw.png" class="field-icon">
+                                <input type="password" placeholder="Confirm password" name="password_confirm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button>Create!</button>
+                </div>
             </div>
         </div>
         
-        <div class="about" style="display: none;">
+        <!-- About -->
+        <div id="about" class="about hidden">
             <div>
                 <h1>About the site:</h1>
                 <p>

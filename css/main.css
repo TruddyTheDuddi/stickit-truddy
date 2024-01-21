@@ -82,8 +82,12 @@ p{
 
 nav{
     display: flex;
-    gap: 2em;
+    gap: 1.5em;
     font-family: "Bake Bunny", sans-serif;
+}
+
+nav .end{
+    margin-left: auto;
 }
 
 a{
@@ -92,11 +96,18 @@ a{
     text-shadow: 1px 1px 3px white;
     position: relative;
     cursor: pointer;
+    transition: 0.2s transform;
 }
 
 a:hover{
-    opacity: 0.5;
+    opacity: 0.8;
 }
+
+a:active{
+    transition: 0s;
+    transform: translateY(2px);
+}
+
 
 a::after{
     /* Line underneath hyperlink */
@@ -106,10 +117,14 @@ a::after{
     bottom: 0.1em;
     left: 0;
     right: 100%;
-    height: 0.1em;
+    height: 0.11em;
     border-radius: 0.2em;
     background-color: var(--action);
     transition: 0.2s;
+}
+
+a.active{
+    transform: translateY(-4px);
 }
 
 a.active::after{
@@ -204,9 +219,6 @@ button:active{
     background-position: center;
 }
 
-.booklet h1{
-}
-
 .hero{
     display: grid;
     grid-template-columns: 1fr 1.1fr;
@@ -237,10 +249,6 @@ button:active{
 
 .hero h1{
     font-size: 2.4em;
-}
-
-.booklet nav{
-    justify-content: end;
 }
 
 .booklet .about{
