@@ -5,7 +5,6 @@ const PAGES = {
 
 // Setup page navigation, with callback to make sure the page change between create and login is handled
 setupNav(document.getElementById("booklet-nav"), (hash) => {
-    console.log("Hash changed to", hash);
     if(hash == "#create-account"){
         currentPage = PAGES.create;
     } else if (hash == "#login") {
@@ -310,7 +309,6 @@ loginSteps.forgot.nextSkip = loginSteps.login;
 // For each step, add a submit event listener for create account and login
 [createSteps, loginSteps].forEach(steps => {
     for (let step in steps) {
-        console.log(step);
 
         // The button is in the subPanel, it there's none of that, it's in the panel
         let button;
@@ -349,7 +347,6 @@ let currentStep = {
  * @param {*} to
  */
 function goTo(to){
-    console.log("To:", to);
     // Get previous step's page
     let current = null;
     if(currentPage == PAGES.create){
