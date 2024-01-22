@@ -46,8 +46,8 @@ function setupNav(nav, callback = null){
         item.addEventListener("click", (e) => {
             e.preventDefault();
 
+            // Record if the page is already at the top or not
             let isPageScrollTop = window.scrollY === 0;
-            console.log(isPageScrollTop);
             
             // Set hash without triggering the hashchange event
             history.pushState(null, null, hash);
@@ -95,7 +95,6 @@ function setupNav(nav, callback = null){
         content[to].a.classList.add("active");
 
         if(transition){
-            console.log("transitioning. Prev:", currentHash, "Next:", to);
             content[currentHash].page.classList.remove("hidden");
             content[currentHash].page.classList.add("fade","fade-hide");
 
