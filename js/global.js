@@ -30,6 +30,7 @@ function createEl(tag, props) {
 function setupNav(nav, callback = null){
     let content = {};
     let currentHash = null;
+    let setTimeoutId = null;
 
     // Grab all the nav items
     nav.querySelectorAll("a").forEach(item => {
@@ -44,16 +45,16 @@ function setupNav(nav, callback = null){
         // Add click event for transition
         item.addEventListener("click", (e) => {
             e.preventDefault();
+
+            let isPageScrollTop = window.scrollY === 0;
+            console.log(isPageScrollTop);
             
             // Set hash without triggering the hashchange event
             history.pushState(null, null, hash);
             
             // Smooth scroll to top
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
-            transitionPage(hash);
+            scrollTopSmooth( window.scrollY, 300, "ease-in-out" );
+            transitionPage(hash, !isPageScrollTop);
         });
     });
 
@@ -77,13 +78,12 @@ function setupNav(nav, callback = null){
         }
     });
 
-    let setTimeoutId = null;
     /**
      * Transition to a page
-     * @param {*} hash 
+     * @param {*} to hash to transition to
      * @param {boolean} transition whether to transition animate or not
      */
-    function transitionPage(hash, transition = true){
+    function transitionPage(to, transition = true){
         // When clicked, remove the active class from all items and hide all pages
         for(let key in content){
             content[key].a.classList.remove("active");
@@ -92,10 +92,10 @@ function setupNav(nav, callback = null){
         }
 
         // Then add it to the clicked item
-        content[hash].a.classList.add("active");
+        content[to].a.classList.add("active");
 
-        // Create animation effect
         if(transition){
+            console.log("transitioning. Prev:", currentHash, "Next:", to);
             content[currentHash].page.classList.remove("hidden");
             content[currentHash].page.classList.add("fade","fade-hide");
 
@@ -106,28 +106,25 @@ function setupNav(nav, callback = null){
             setTimeoutId = setTimeout(() => {
                 content[currentHash].page.classList.remove("fade","fade-hide");
                 content[currentHash].page.classList.add("hidden");
-                content[hash].page.classList.remove("hidden");
-                content[hash].page.classList.add("fade","fade-hidden");
-                currentHash = hash;
+                content[to].page.classList.remove("hidden");
+                content[to].page.classList.add("fade","fade-hidden");
                 // Mini timeout to allow the fade-hidden to be applied
                 setTimeout(() => {
-                    content[hash].page.classList.remove("fade","fade-hidden");
-                    content[hash].page.classList.add("fade","fade-show");
+                    currentHash = to;
+                    content[to].page.classList.remove("fade","fade-hidden");
+                    content[to].page.classList.add("fade","fade-show");
                 }, 10);
-            }, 500);
+            }, 300);
         } else {
-            content[hash].page.classList.remove("hidden");
+            setTimeoutId != null ? clearTimeout(setTimeoutId) : null;
+            content[to].page.classList.remove("hidden");
+            currentHash = to;
         }
-
-
-        // And show the corresponding page
 
         // Trigger the callback if provided
         if(callback){
-            callback(hash);
+            callback(to);
         }
-
-        // 
     }
 }
 
@@ -202,3 +199,45 @@ inputs.forEach(input => {
     }
 
 });
+
+
+const TIMINGFUNC_MAP = {
+    "linear": t => t,
+    "ease-in": t => t * t,
+    "ease-out": t => t * ( 2 - t ),
+    "ease-in-out": t => ( t < .5 ? 2 * t * t : -1 + ( 4 - 2 * t ) * t )
+};
+
+/**
+* Scroll from initY to 0
+* Thanks to Dmitry Sheiko: https://codepen.io/dsheiko 
+* @param {number} initY - initial scroll Y
+* @param {number} duration - transition duration
+* @param {string} timingName - timing function name. Can be one of linear, ease-in, ease-out, ease-in-out
+*/
+function scrollTopSmooth( initY, duration = 300, timingName = "linear" ) {  
+    const timingFunc = TIMINGFUNC_MAP[ timingName ];
+    let start = null;
+    const step = ( timestamp ) => {
+        start = start || timestamp;
+        const progress = timestamp - start,
+            // Growing from 0 to 1
+            time = Math.min( 1, ( ( timestamp - start ) / duration ) );
+
+        window.scrollTo( 0, initY - ( timingFunc( time ) * initY ) );
+        if ( progress < duration ) {
+            window.requestAnimationFrame( step );
+        }
+    };
+
+    window.requestAnimationFrame( step );  
+}
+
+// Subscribe any element with [href="#"]
+// Array.from( document.querySelectorAll( "[href='#']" ) )
+// .forEach( btn => {
+//  btn.addEventListener( "click", ( e ) => {
+//    e.preventDefault();
+//    scrollTopSmooth( window.scrollY, 300, "ease-in-out" ); 
+//  });
+// });

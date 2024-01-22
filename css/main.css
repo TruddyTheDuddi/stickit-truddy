@@ -181,12 +181,12 @@ button:active{
 /* Fade panels aniamtion */
 .fade.fade-hide{
     opacity: 0;
-    transition: 0.4s opacity;
+    transition: 0.3s opacity;
 }
 
 .fade.fade-show{
     opacity: 1;
-    transition: 0.2s opacity;
+    transition: 0.3s opacity;
 }
 
 .fade.fade-hidden{
