@@ -53,7 +53,7 @@ function setupNav(nav, callback = null){
             history.pushState(null, null, hash);
             
             // Smooth scroll to top
-            scrollTopSmooth( window.scrollY, 300, "ease-in-out" );
+            scrollTopSmooth(0, 300, "ease-in-out");
             transitionPage(hash, !isPageScrollTop);
         });
     });
@@ -208,29 +208,33 @@ const TIMINGFUNC_MAP = {
 };
 
 /**
-* Scroll from initY to 0
-* Thanks to Dmitry Sheiko: https://codepen.io/dsheiko 
-* @param {number} initY - initial scroll Y
-* @param {number} duration - transition duration
-* @param {string} timingName - timing function name. Can be one of linear, ease-in, ease-out, ease-in-out
-*/
-function scrollTopSmooth( initY, duration = 300, timingName = "linear" ) {  
-    const timingFunc = TIMINGFUNC_MAP[ timingName ];
+ * Scroll smoothly to a specific position
+ * Modification from Dmitry Sheiko's code: https://codepen.io/dsheiko 
+ * @param {number} targetY - target scroll Y position
+ * @param {number} duration - transition duration
+ * @param {string} timingName - timing function name. Can be one of linear, ease-in, ease-out, ease-in-out
+ */
+function scrollTopSmooth(targetY, duration = 300, timingName = "linear") {  
+    const timingFunc = TIMINGFUNC_MAP[timingName];
+    const initY = window.scrollY;
     let start = null;
-    const step = ( timestamp ) => {
-        start = start || timestamp;
-        const progress = timestamp - start,
-            // Growing from 0 to 1
-            time = Math.min( 1, ( ( timestamp - start ) / duration ) );
 
-        window.scrollTo( 0, initY - ( timingFunc( time ) * initY ) );
-        if ( progress < duration ) {
-            window.requestAnimationFrame( step );
+    const step = (timestamp) => {
+        start = start || timestamp;
+        const progress = timestamp - start;
+        const time = Math.min(1, (timestamp - start) / duration);
+        
+        const newY = initY + (timingFunc(time) * (targetY - initY));
+        window.scrollTo(0, newY);
+
+        if (progress < duration) {
+            window.requestAnimationFrame(step);
         }
     };
 
-    window.requestAnimationFrame( step );  
+    window.requestAnimationFrame(step);  
 }
+
 
 // Subscribe any element with [href="#"]
 // Array.from( document.querySelectorAll( "[href='#']" ) )
