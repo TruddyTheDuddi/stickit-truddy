@@ -29,6 +29,7 @@ function createEl(tag, props) {
  */
 function setupNav(nav, callback = null){
     let content = {};
+    let currentHash = null;
 
     // Grab all the nav items
     nav.querySelectorAll("a").forEach(item => {
@@ -50,7 +51,7 @@ function setupNav(nav, callback = null){
             // Smooth scroll to top
             window.scrollTo({
                 top: 0,
-                behavior: "smooth",
+                behavior: "smooth"
             });
             transitionPage(hash);
         });
@@ -58,43 +59,75 @@ function setupNav(nav, callback = null){
 
     // Grab default either from hash or first item
     let defaultPage = window.location.hash ? window.location.hash : Object.keys(content)[0];
+    currentHash = defaultPage;
 
     if(!content[defaultPage]){
         // If the page does not exist, go to 404
         window.location.href = UTILTY_PAGES.error_404;        
     }
-    transitionPage(defaultPage);
+    transitionPage(defaultPage, false);
 
     // Transition to the page when the hash changes
     window.addEventListener("hashchange", () => {
         if(content[window.location.hash]) {
-            transitionPage(window.location.hash);
+            transitionPage(window.location.hash, false);
         } else {
             // If the page does not exist, go to 404
             window.location.href = UTILTY_PAGES.error_404;
         }
     });
 
-    
+    let setTimeoutId = null;
     /**
      * Transition to a page
      * @param {*} hash 
+     * @param {boolean} transition whether to transition animate or not
      */
-    function transitionPage(hash){
+    function transitionPage(hash, transition = true){
         // When clicked, remove the active class from all items and hide all pages
         for(let key in content){
             content[key].a.classList.remove("active");
             content[key].page.classList.add("hidden");
+            content[key].page.classList.remove("fade-show");
         }
+
         // Then add it to the clicked item
         content[hash].a.classList.add("active");
+
+        // Create animation effect
+        if(transition){
+            content[currentHash].page.classList.remove("hidden");
+            content[currentHash].page.classList.add("fade","fade-hide");
+
+            // Clear the timeout if it exists
+            setTimeoutId != null ? clearTimeout(setTimeoutId) : null;
+
+            // Set the timeout
+            setTimeoutId = setTimeout(() => {
+                content[currentHash].page.classList.remove("fade","fade-hide");
+                content[currentHash].page.classList.add("hidden");
+                content[hash].page.classList.remove("hidden");
+                content[hash].page.classList.add("fade","fade-hidden");
+                currentHash = hash;
+                // Mini timeout to allow the fade-hidden to be applied
+                setTimeout(() => {
+                    content[hash].page.classList.remove("fade","fade-hidden");
+                    content[hash].page.classList.add("fade","fade-show");
+                }, 10);
+            }, 500);
+        } else {
+            content[hash].page.classList.remove("hidden");
+        }
+
+
         // And show the corresponding page
-        content[hash].page.classList.remove("hidden");
 
         // Trigger the callback if provided
         if(callback){
             callback(hash);
         }
+
+        // 
     }
 }
 
