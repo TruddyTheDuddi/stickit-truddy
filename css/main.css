@@ -19,13 +19,13 @@
 
 @font-face {
     font-family: 'HDV';
-    src: url('../fonts/HVD_Comic_Serif_Pro.otf');
+    src: url('../fonts/HVDComicSerifPro.woff');
     font-weight: bold;
 }
 
 @font-face {
     font-family: 'Children Sans';
-    src: url('../fonts/ChildrenSans.ttf');
+    src: url('../fonts/ChildrenSans.woff');
 }
 
 @font-face {
@@ -35,7 +35,7 @@
 
 @font-face {
     font-family: 'KG';
-    src: url('../fonts/KGBlankSpaceSolid.ttf');
+    src: url('../fonts/KGBlankSpaceSolid-webfont.woff');
     font-weight: bold;
 }
 
