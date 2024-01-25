@@ -23,29 +23,50 @@ function createEl(tag, props) {
 
 /**
  *
- * @param {*} nav element containing <a>'s to setup
  * @param {*} callback to provide that will trigger when page 
  *  changes with the hash as the argument
  */
-function setupNav(nav, callback = null){
+function setupNav(callback = null){
     let content = {};
     let currentHash = null;
     let setTimeoutId = null;
 
-    // Grab all the nav items
-    nav.querySelectorAll("a").forEach(item => {
+    // Get all a tags with # in the href and buttons with data-href
+    let aTags = document.querySelectorAll("a[href^='#']");
+    let btns = document.querySelectorAll("[data-href]");
+
+    // Setup all aTags
+    aTags.forEach(item => {
         let hash = item.getAttribute("href");
         // Log the item
         content[hash] = {
             a: item,
-            hash: item.getAttribute("href"),
-            page: document.querySelector(item.getAttribute("href")),
+            hash: hash,
+            page: document.querySelector(hash),
         };
 
         // Add click event for transition
         item.addEventListener("click", (e) => {
             e.preventDefault();
 
+            // Record if the page is already at the top or not
+            let isPageScrollTop = window.scrollY === 0;
+            
+            // Set hash without triggering the hashchange event
+            history.pushState(null, null, hash);
+            
+            // Smooth scroll to top
+            scrollTopSmooth(0, 300, "ease-in-out");
+            transitionPage(hash, !isPageScrollTop);
+        });
+    });
+
+    // Setup all buttons
+    btns.forEach(item => {
+        let hash = item.getAttribute("data-href");
+
+        // Add click event for transition
+        item.addEventListener("click", (e) => {
             // Record if the page is already at the top or not
             let isPageScrollTop = window.scrollY === 0;
             

@@ -4,7 +4,7 @@ const PAGES = {
 }
 
 // Setup page navigation, with callback to make sure the page change between create and login is handled
-setupNav(document.getElementById("booklet-nav"), (hash) => {
+setupNav((hash) => {
     if(hash == "#create-account"){
         currentPage = PAGES.create;
     } else if (hash == "#login") {
