@@ -3,161 +3,178 @@ import { PAGE_ROOT } from "./global.js";
 // Use this to generate the booklet pages
 const X = 0; const Y = 1;
 
-/**
- * Renders the booklet page with the given data
- * @param {*} pageData 
- * @param {boolean} editable is this a sticker editor
- */
-function generatePage(pageData, editable = false){
-    let page = document.createElement("div");
-    page.classList.add("page");
-    if (editable) page.classList.add("editable");
+// Behaves like a constructor for a page element
+function createPage(data, editable=false){
+    return {
+        // Page
+        _pageElement: null,
 
-    // Generate all stickers
-    pageData.stickers.forEach(s => {
-        // Create base
-        let stickerDiv = document.createElement("div");
-        stickerDiv.classList.add("sticker");
-        stickerDiv.style.width = `${s.size}%`;
-        stickerDiv.style.left = `${s.position[X]}%`;
-        stickerDiv.style.top = `${s.position[Y]}%`;
-        stickerDiv.setAttribute("data-sticker-id", s.id);
-        
-        // Create image holder
-        let stickerImgHolder = document.createElement("div");
-        stickerImgHolder.classList.add("sticker-img-holder");
-        
-        // Create image
-        let stickerImg = document.createElement("img");
-        stickerImg.style.transform = `rotate(${s.rotate}deg)`;
-        stickerImg.src = PAGE_ROOT + `img/stickers/${s.file}`;
-        stickerImgHolder.appendChild(stickerImg);
-        stickerDiv.appendChild(stickerImgHolder);
+        // Data page what is changed
+        _pageData: data,
 
-        // Create action buttons
-        if(editable){
-            let action = document.createElement("div");
-            action.classList.add("action");
-            let actBtn = [
-                {
-                    // Increase size
-                    img : 'size_plus',
-                    action : (listItem) => {
-                        if(listItem.size >= 70) return;
-                        listItem.size += 2.5;
-                        stickerDiv.style.width = `${listItem.size}%`;
+        // Is this page editable
+        isEditable: editable,
+
+        /**
+         * Renders the booklet page with the given data
+         * @param {*} pageData 
+         * @param {boolean} editable is this a sticker editor
+         */
+        generate: function() {
+            this._pageElement = document.createElement("div");
+            this._pageElement.classList.add("page");
+            if (this.isEditable) this._pageElement.classList.add("editable");
+            
+            // Generate all stickers
+            this._pageData.stickers.forEach(s => {
+                // Create base
+                let stickerDiv = document.createElement("div");
+                stickerDiv.classList.add("sticker");
+                stickerDiv.style.width = `${s.size}%`;
+                stickerDiv.style.left = `${s.position[X]}%`;
+                stickerDiv.style.top = `${s.position[Y]}%`;
+                stickerDiv.setAttribute("data-sticker-id", s.id);
+                
+                // Create image holder
+                let stickerImgHolder = document.createElement("div");
+                stickerImgHolder.classList.add("sticker-img-holder");
+                
+                // Create image
+                let stickerImg = document.createElement("img");
+                stickerImg.style.transform = `rotate(${s.rotate}deg)`;
+                stickerImg.src = PAGE_ROOT + `img/stickers/${s.file}`;
+                stickerImgHolder.appendChild(stickerImg);
+                stickerDiv.appendChild(stickerImgHolder);
+            
+                // Create action buttons
+                if(editable){
+                    let action = document.createElement("div");
+                    action.classList.add("action");
+                    let actBtn = [
+                        {
+                            // Increase size
+                            img : 'size_plus',
+                            action : (listItem) => {
+                                if(listItem.size >= 70) return;
+                                listItem.size += 2.5;
+                                stickerDiv.style.width = `${listItem.size}%`;
+                            }
+                        },
+                        {
+                            // Decrease size
+                            img : 'size_minus',
+                            action : (listItem) => {
+                                if(listItem.size <= 5) return;
+                                listItem.size -= 2.5;
+                                stickerDiv.style.width = `${listItem.size}%`;
+                            }
+                        },
+                        {
+                            // Rotate right
+                            img : 'rotate_right',
+                            action : (listItem) => {
+                                listItem.rotate += 10;
+                                stickerImg.style.transform = `rotate(${listItem.rotate}deg)`;
+                            } 
+                        },
+                        {
+                            // Rotate left
+                            img : 'rotate_left',
+                            action : (listItem) => {
+                                listItem.rotate -= 10;
+                                stickerImg.style.transform = `rotate(${listItem.rotate}deg)`;
+                            } 
+                        },
+                    ];
+            
+                    if(editable){
+                        actBtn.forEach(a => {
+                            let btn = document.createElement("img");
+                            btn.src = PAGE_ROOT + `img/icons/${a.img}.svg`;
+                            btn.draggable = false;
+            
+                            // Setup behavior
+                            btn.addEventListener("click", () => {
+                                a.action(s);
+                            })
+            
+                            action.appendChild(btn);
+                        });
                     }
-                },
-                {
-                    // Decrease size
-                    img : 'size_minus',
-                    action : (listItem) => {
-                        if(listItem.size <= 5) return;
-                        listItem.size -= 2.5;
-                        stickerDiv.style.width = `${listItem.size}%`;
-                    }
-                },
-                {
-                    // Rotate right
-                    img : 'rotate_right',
-                    action : (listItem) => {
-                        listItem.rotate += 10;
-                        stickerImg.style.transform = `rotate(${listItem.rotate}deg)`;
-                    } 
-                },
-                {
-                    // Rotate left
-                    img : 'rotate_left',
-                    action : (listItem) => {
-                        listItem.rotate -= 10;
-                        stickerImg.style.transform = `rotate(${listItem.rotate}deg)`;
-                    } 
-                },
-            ];
+                    stickerDiv.appendChild(action);
+                }
+            
+                this._pageElement.appendChild(stickerDiv);
+                if (editable) this._setupDragging(stickerImgHolder, s);
+            });
+            
+            return this._pageElement;
+        },
 
-            if(editable){
-                actBtn.forEach(a => {
-                    let btn = document.createElement("img");
-                    btn.src = PAGE_ROOT + `img/icons/${a.img}.svg`;
-                    btn.draggable = false;
+        /**
+         * Dragging behavior for the sticker
+         * @param {*} stickerImgHolder 
+         * @param {*} listElement element in the list for ordering
+         */
+        _setupDragging: function (stickerImgHolder, listElement){
+            let isDragging = false;
+            let dragPoint = [0, 0];
+            let stickerBox = stickerImgHolder.parentElement;
 
-                    // Setup behavior
-                    btn.addEventListener("click", () => {
-                        a.action(s);
-                    })
+            stickerImgHolder.addEventListener("mousedown", (e) => {
+                setDragging(true);
 
-                    action.appendChild(btn);
-                });
-            }
-            stickerDiv.appendChild(action);
+                // Log where was click
+                let rect = stickerBox.getBoundingClientRect();
+                dragPoint = [e.clientX - rect.left - rect.width * 0.5, e.clientY - rect.top - rect.height * 0.5];
+
+                // Bring to front by putting element as last child of page
+                this._pageElement.appendChild(stickerBox);
+                // Put sticker at end of list
+                pageDummy.stickers.push(
+                    pageDummy.stickers.splice(pageDummy.stickers.indexOf(listElement), 1)[0]
+                );
+            });
+
+            this._pageElement.addEventListener("mouseup", () => {
+                if(!isDragging) return;
+                setDragging(false);
+            });
+
+            this._pageElement.addEventListener("mousemove", (e) => {
+                if(!isDragging) return;
+
+                let x = e.clientX; let y = e.clientY;
+                let dx = x - dragPoint[0]; let dy = y - dragPoint[1];
+
+                // Convert to percentage
+                let rect = this._pageElement.getBoundingClientRect();
+                let left = (dx - rect.left) / rect.width * 100;
+                let top = (dy - rect.top) / rect.height * 100;
+
+                // Update list element
+                listElement.position = [left,top];
+
+                stickerBox.style.left = `${left}%`;
+                stickerBox.style.top = `${top}%`;
+            
+            });
+
+            // Util function for styling
+            function setDragging(bool){
+                isDragging = bool;
+                if(bool){
+                    stickerBox.classList.add('dragging');
+                } else {
+                    stickerBox.classList.remove('dragging');
+                }
+            }  
         }
 
-        page.appendChild(stickerDiv);
-        if (editable) setupDragging(stickerImgHolder, s);
-    });
-
-    return page;
-
-    /**
-     * Dragging behavior for the sticker
-     * @param {*} stickerImgHolder 
-     * @param {*} listElement element in the list for ordering
-     */
-    function setupDragging(stickerImgHolder, listElement){
-        let isDragging = false;
-        let dragPoint = [0, 0];
-        let stickerBox = stickerImgHolder.parentElement;
-
-        stickerImgHolder.addEventListener("mousedown", (e) => {
-            setDragging(true);
-
-            // Log where was click
-            let rect = stickerBox.getBoundingClientRect();
-            dragPoint = [e.clientX - rect.left - rect.width * 0.5, e.clientY - rect.top - rect.height * 0.5];
-
-            // Bring to front by putting element as last child of page
-            page.appendChild(stickerBox);
-            // Put sticker at end of list
-            pageDummy.stickers.push(
-                pageDummy.stickers.splice(pageDummy.stickers.indexOf(listElement), 1)[0]
-            );
-        });
-
-        page.addEventListener("mouseup", () => {
-            if(!isDragging) return;
-            setDragging(false);
-        });
-
-        page.addEventListener("mousemove", (e) => {
-            if(!isDragging) return;
-
-            let x = e.clientX; let y = e.clientY;
-            let dx = x - dragPoint[0]; let dy = y - dragPoint[1];
-
-            // Convert to percentage
-            let rect = page.getBoundingClientRect();
-            let left = (dx - rect.left) / rect.width * 100;
-            let top = (dy - rect.top) / rect.height * 100;
-
-            // Update list element
-            listElement.position = [left,top];
-
-            stickerBox.style.left = `${left}%`;
-            stickerBox.style.top = `${top}%`;
-        
-        });
-
-        // Util function for styling
-        function setDragging(bool){
-            isDragging = bool;
-            if(bool){
-                stickerBox.classList.add('dragging');
-            } else {
-                stickerBox.classList.remove('dragging');
-            }
-        }
-    }
+    };
 }
+
+
 
 let pageDummy = {
     title: "Truddy",
@@ -221,4 +238,5 @@ let pageDummy = {
     ]
 };
 
-document.querySelector("main").appendChild(generatePage(pageDummy, true));
+let page = createPage(pageDummy, true);
+document.querySelector("main").appendChild(page.generate());
