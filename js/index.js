@@ -1,3 +1,7 @@
+import { setupNav } from "./global.js";
+import { AJAX } from "./ajax.js";
+
+let currentPage = null;
 const PAGES = {
     create: document.getElementById("create-account"),
     login: document.getElementById("login"),
