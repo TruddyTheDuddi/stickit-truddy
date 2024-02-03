@@ -57,6 +57,11 @@ main{
 }
 
 .page.editable .sticker.dragging{
+    border: 1.7px dashed rgba(0,0,0,0.4);
+    border-radius: 0.25em;
+}
+
+.page.editable .sticker.dragging .sticker-img-holder{
     cursor: grabbing;
     opacity: 0.6;
     filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.4));
@@ -74,6 +79,7 @@ main{
     left: 50%;
     transform: translate(-50%, -50%);
     pointer-events: none;
+    z-index: 999;
 }
 
 .page.editable .sticker:hover:not(.dragging) .action{
