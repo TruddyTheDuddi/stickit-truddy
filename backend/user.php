@@ -34,6 +34,18 @@ class LoggedUser {
     public static function unset() {
         unset($_SESSION[self::SESSION_FIELD]);
     }
+
+    /**
+     * Check the permission of the logged user
+     */
+    public static function is_above($role){
+        $user = self::get();
+        // If user not logged in, no permission
+        if(!isset($user)){
+            return false;
+        }
+        return $user->is_above($role);
+    }
 }
 
 /**
