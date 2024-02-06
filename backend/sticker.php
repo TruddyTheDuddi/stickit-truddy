@@ -119,9 +119,9 @@ class Sticker {
             "scale" => $sticker['scale']
         );
 
-        // Check if user revealed sticker
-        $user_id = LoggedUser::get();
-        if(isset($user)){
+        // Soft check if user revealed sticker
+        if(LoggedUser::is_logged()){
+            $user_id = LoggedUser::get()->id;
             $sql = "SELECT count(*) AS sticker_counts FROM sticker_user_collected WHERE user_id = $user_id AND sticker_id = $this->id";
             $res = mysqli_query($db, $sql);
             $data = mysqli_fetch_assoc($res);
@@ -144,6 +144,7 @@ class Sticker {
     public function update_transform($pos_x, $pos_y, $rotation, $scale){
         $this->check_write_perms();
 
+        // Update data in object
         $this->transform = array(
             "pos_x" => $pos_x,
             "pos_y" => $pos_y,
@@ -196,8 +197,11 @@ class Sticker {
             }
     
             // Perform sticker's page update
+            $this->page_id = $id;
             $sql = "UPDATE stickers SET page_id = $id WHERE sticker_id = $this->id";
         } else {
+            // Perform sticker's page update
+            $this->page_id = null;
             $sql = "UPDATE stickers SET page_id = NULL WHERE sticker_id = $this->id";
         }
 
@@ -217,7 +221,8 @@ class Sticker {
         $this->check_write_perms();
         $bool = make_sql_safe((int)$status);
 
-        $sql = "UPDATE stickers SET obtainability = $bool WHERE sticker_id = $this->id";
+        $this->obtainable = $status;
+        $sql = "UPDATE stickers SET obtainable = $bool WHERE sticker_id = $this->id";
         if(!mysqli_query($db, $sql)){
             throw new Exception("Rip: ".$db->error);
         }
@@ -240,8 +245,12 @@ class Sticker {
         Img::move($tmp_sticker, ImgPaths::PATH_STICKERS_REVEAL);
         Img::move($tmp_shadow_sticker, ImgPaths::PATH_STICKERS_HIDDEN);
 
+        // Prepare for DB update
         $sticker_name = make_sql_safe(basename($tmp_sticker));
         $sticker_shadow_name = make_sql_safe(basename($tmp_shadow_sticker));
+
+        $this->img_path = basename($sticker_name);
+        $this->img_path_secret = basename($sticker_shadow_name);
         
         // Update file names in database
         $sql = "UPDATE stickers SET img_path = '$sticker_name', img_path_secret = '$sticker_shadow_name' WHERE sticker_id = $this->id";
@@ -263,9 +272,11 @@ class Sticker {
         if($name == ""){
             // If empty, set to null, but only if page_id is null
             if(!isset($this->page_id)){
+                $this->name = null;
                 $sql = "UPDATE stickers SET name = NULL WHERE sticker_id = $this->id";
             }
         } else {
+            $this->name = $name;
             $sql = "UPDATE stickers SET name = '$name' WHERE sticker_id = $this->id";
         }
         if(!mysqli_query($db, $sql)){
