@@ -2,17 +2,32 @@
 include_once("tools.php");
 include_once("user.php");
 
-
+/**
+ * This class performs verification, and manipulations on images.
+ * It always creates `.webp` images.
+ * 
+ * After the manipulation is done, it will put the file in a tmp
+ * folder and that path will be returned after completion so that 
+ * callee can decide what to do with it.
+ */
 class Img{
     const MAX_FILE_SIZE = 1000*1000*8; // 8 Mb
-    const FILE_DIM_X = 2000;
-    const FILE_DIM_Y = 2000;
+    const FILE_DIM_X = 1500;
+    const FILE_DIM_Y = 1500;
     const ALLOWED_PIC = array("image/png", "image/jpeg", "image/jpg", "image/webp");
 
     const WEBP_QUALITY = 80; // Compression quality
 
-    const STICKER_DIR_PLAIN  = DOC_ROOT."img/stickers/plain/";
-    const STICKER_DIR_SECRET = DOC_ROOT."img/stickers/secret/";
+    const TMP_DIR = DOC_ROOT."img/tmp/";
+
+    /**
+     * Creates a new file path for a `.webp` image, 
+     * inside of the tmp folder.
+     */
+    private static function create_unique_file(){
+        $file_name = hash("md5", uniqid());
+        return Img::TMP_DIR.$file_name.".webp";
+    }
 
     /**
      * Validates an images by checking basic info
@@ -20,7 +35,6 @@ class Img{
      */
     private static function run_validation($file){
         global $db;
-
         // TODO: Check if uploads allowed
     
         // Error uploading
@@ -29,10 +43,8 @@ class Img{
         }
     
         // Metadata
-        $fName = make_sql_safe($file['name']);
         $fPath = make_sql_safe($file['tmp_name']);
         $fSize = make_sql_safe($file['size']);
-        $fExt  = strtolower(make_sql_safe(pathinfo($fName)['extension']));
     
         // Correct file type
         $fileMime = mime_content_type($fPath);
@@ -49,24 +61,28 @@ class Img{
     /**
      * Processing the image by perfomring validation, moving, 
      * compression
+     * @param file $file for picture as from $_FILES format
+     * @return string Path
      */
     public static function image_process($file){    
         // Validate image
         Img::run_validation($file);
-        
+
         // Let compressor handle the file
-        $name = Img::image_convert(make_sql_safe($file['tmp_name']), Img::STICKER_DIR_PLAIN.hash("md5", uniqid()), 80);
-    
-        return $name;
+        $path = Img::image_convert(make_sql_safe($file['tmp_name']));
+        return $path;
     }
 
     /**
-     * Takes a file path and converts it to a webp image
-     * @param string $file_path Path to file
-     * @param string $save_path Path to save file
-     * @return string the name of the file (name.extension)
+     * Takes a file path, optimizes and converts it to a 
+     * webp image.
+     * @param string $file_path Path to original file
+     * @return string Path to the new file
      */
-    public static function image_convert($file_path, $save_path){
+    public static function image_convert($file_path){
+        // Random name
+        $save_path = Img::create_unique_file();
+
         list($x, $y, $type) = getimagesize($file_path);
     
         // Rescale image if too big
@@ -104,23 +120,24 @@ class Img{
         imagecopyresampled($file_img_new, $file_img_orig, 0, 0, 0, 0, $x, $y, imagesx($file_img_orig), imagesy($file_img_orig));
     
         // Save as WebP
-        $save_path_webp = $save_path . ".webp";
-        imagewebp($file_img_new, $save_path_webp, self::WEBP_QUALITY);
+        imagewebp($file_img_new, $save_path, self::WEBP_QUALITY);
     
         imagedestroy($file_img_orig);
         imagedestroy($file_img_new);
     
-        return pathinfo($save_path_webp)['basename'];
+        return $save_path;
     }
     
     /**
      * Create a black image for the mystery sticker where anything
-     * but alpha channel is turned into black
-     * @param string $file_path Path to file
-     * @param string $save_path Path to save file
-     * @return string the name of the file (name.extension)
+     * but alpha channel is turned into black.
+     * @param string $file_path Path to original file (must be `.webp`)
+     * @return string Path to the new file
      */
-    public static function createBlackImageWithAlpha($file_path, $save_path) {
+    public static function create_secret_sticker($file_path) {
+        // Random name
+        $save_path = Img::create_unique_file();
+
         // Ensure the file is a WebP image
         if (mime_content_type($file_path) !== 'image/webp') {
             throw new Exception("The file must be a WebP image.");
@@ -132,8 +149,7 @@ class Img{
             throw new Exception("Failed to open WebP image.");
         }
 
-        $width = imagesx($original);
-        $height = imagesy($original);
+        $width = imagesx($original); $height = imagesy($original);
 
         // Create a true color image with the same size
         $blackImage = imagecreatetruecolor($width, $height);
@@ -155,27 +171,22 @@ class Img{
         }
 
         // Save the new image as WebP
-        $save_path_webp = $save_path . ".webp";
-        imagewebp($blackImage, $save_path_webp);
+        imagewebp($blackImage, $save_path);
 
         // Cleanup
         imagedestroy($original);
         imagedestroy($blackImage);
 
-        return basename($save_path_webp);
+        return $save_path;
     }
 
 }
 
-// print_r($_FILES);
 
 if(isset($_FILES['test'])){
-    // echo "submitted image".$_FILES['test']['name'];
-    $normal = Img::image_process($_FILES['test'], true);
-    echo "<img src='".WEBSITE_SERVE."img/stickers/plain/".$normal."' height=300px>";
-    
-    $hidden = Img::createBlackImageWithAlpha(IMG::STICKER_DIR_PLAIN.$normal, Img::STICKER_DIR_SECRET.hash("md5", uniqid()));
-    echo "<img src='".WEBSITE_SERVE."img/stickers/secret/".$hidden."' height=300px>";
+    echo "Testing image uploader with file: ";
+    print_r($_FILES);
+    echo(Img::create_secret_sticker(Img::image_process($_FILES['test'])));
 }
 
 ?>

@@ -15,6 +15,8 @@ Here is a list of non-exhaustive features that the website is currently cable of
 
 ## Other utility features
 Some other bits and bobs that are not necessarily content related but more of **utily features** that I've added to the site and that I'm particulary excited with, worth highlighting in this project:
+- New image handling class `backend/img.php` which manipulates images based on paths. Overall the file path manipulations are a lot more clean with this. Uses a tmp system, the callee of the function decides where to put them. Possible DB integration for images in the future?
+- To keep the code clean, classes (usually where DB stuff happens) will rather throw errors instead of stopping execution and set the response success to false. This means it's the callee who'll have to handle the errors properly. This is good because it's less likely that the JSON repsonse will fail.
 - Users class that allows to easily manage users, fetch their data, check for permission levels.
 - Added sub-page navigation features, which can handle any nav bars, update the URL hash and change the page accordingly. It also handles the browser's back/forward buttons. Can be given custom callbacks to execute when a sub-page is changed.
 - Proper API in the backend `backend/api/` that avoid shoving everything in single php files. Instead it rather calls classes and function from other areas that would handle the heavy-lifting logic, while API files would handle the "high-level" logic. This allows to have a modular, consistent accross all API calls, and organized backend with as little duplicate code as possible. (Auth related files yet to be cleaned though)

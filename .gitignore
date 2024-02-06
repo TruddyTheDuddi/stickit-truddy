@@ -1,4 +1,5 @@
 .DS_Store
 backend/keys.php
-img/stickers/plain/*.webp
-img/stickers/secret/*.webp
+img/stickers/reveal/*.webp
+img/stickers/hidden/*.webp
+img/tmp/*.webp
