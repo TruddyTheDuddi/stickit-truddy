@@ -78,25 +78,15 @@ class Album {
         // Clean up pages, if it's not sequencial or has gaps
         ksort($this->pages);
         $this->pages = array_values($this->pages);
-    }
 
-    /**
-     * Downloads the stickers into the object from the 
-     * database. Still need to find out if this could be
-     * done by default anytime an album is called?
-     */
-    public function load_stickers(){
-        global $db;
+        // Load the stickers            
         $this->stickers = array();
-        
         $sql = "SELECT sticker_id FROM stickers WHERE album_id = $this->id";
         $res = mysqli_query($db, $sql);
         while($sticker = mysqli_fetch_assoc($res)){
             array_push($this->stickers, new Sticker($sticker['sticker_id']));
         }
     }
-
-
 
     public function __toString() {
         $print = "<b>Album:</b><br>";
@@ -112,7 +102,6 @@ class Album {
 }
 
 $a = new Album(1);
-$a->load_stickers();
 
 echo $a;
 
