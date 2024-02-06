@@ -182,16 +182,4 @@ class Img{
 
 }
 
-
-if(isset($_FILES['test'])){
-    echo "Testing image uploader with file: ";
-    print_r($_FILES);
-    echo(Img::create_secret_sticker(Img::image_process($_FILES['test'])));
-}
-
 ?>
-
-<form action="" method="post" enctype="multipart/form-data">
-    <input type="file" name="test" id="">
-    <input type="submit">
-</form>
