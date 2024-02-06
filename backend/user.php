@@ -8,13 +8,22 @@ class LoggedUser {
     const SESSION_FIELD = "stickers_logged_user_id";
 
     /**
+     * Is there a logged user? Doesn't go through the 
+     * user object creation.
+     * @return boolean
+     */
+    public static function is_logged(){
+        return isset($_SESSION[self::SESSION_FIELD]);
+    }
+
+    /**
      * Get data on the logged in user
-     * @return User object or null if not logged in
+     * @return User object or throws exception if not logged in
      */
     public static function get(){
         // User not logged in
-        if (!isset($_SESSION[self::SESSION_FIELD])) {
-            return null;
+        if (!LoggedUser::is_logged()) {
+            throw new Exception("User is not logged in.");
         }
         $user_id = $_SESSION[self::SESSION_FIELD];
         return new User($user_id);
