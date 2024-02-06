@@ -180,6 +180,37 @@ class Img{
         return $save_path;
     }
 
+    /**
+     * Move a file by keeping the same name to a 
+     * different. Use ImgPaths constants for the $to 
+     * parameter.
+     * @param string $from Location of the current file
+     * @param ImgPaths $to folder where to save
+     * @return string File's new path
+     */
+    public static function move($from, $to) {
+        // Extract the filename
+        $fileName = basename($from);
+
+        // Build the destination path by appending the filename to the $to path
+        $destination = $to . $fileName;
+
+        // Move the file
+        if (!rename($from, $destination)) {
+            throw new Exception("Failed to move the file.");
+        }
+
+        return $destination;
+    }
+}
+
+/**
+ * Defining paths for moving images around
+ * easily on the server.
+ */
+class ImgPaths{
+    const PATH_STICKERS_HIDDEN = DOC_ROOT."img/stickers/shadow/";
+    const PATH_STICKERS_REVEAL = DOC_ROOT."img/stickers/reveal/";
 }
 
 ?>
