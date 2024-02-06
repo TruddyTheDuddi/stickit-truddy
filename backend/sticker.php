@@ -65,11 +65,12 @@ class Sticker {
         $sql = "SELECT * FROM albums WHERE author_id = $author_id AND album_id = $album_id";
         $res = mysqli_query($db, $sql);
         $data = mysqli_fetch_assoc($res);
+        if(!isset($data['album_id'])){
+            throw new Exception("This album does not exist or you don't have permissions to edit it.");
+        }
         
         $sql = "INSERT INTO stickers (album_id, img_path, img_path_secret) VALUES ($album_id, '', '')";
-        if(mysqli_query($db, $sql)){
-            throw new Exception("Album not found");
-        }
+        mysqli_query($db, $sql);
 
         $sticker_id = mysqli_insert_id($db);
         return new Sticker($sticker_id);
