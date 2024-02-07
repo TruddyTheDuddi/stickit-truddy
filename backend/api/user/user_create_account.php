@@ -1,6 +1,6 @@
 <?php
 // Initiate a new user account creation
-include_once("../lib/tools.php");
+include_once("../../lib/tools.php");
 $json = new JSON_Resp();
 
 validate_params(array("username", "password", "email"), $_GET);
