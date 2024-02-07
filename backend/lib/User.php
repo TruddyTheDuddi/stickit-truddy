@@ -5,14 +5,12 @@ require_once("tools.php");
  * Class that resprents a user
  */
 class User {
-    // Default avatar (no shit! I add too many comments)
     private const DEFAULT_AVATAR = "default.png";
 
     // Roles variables
     const ROLE_USER  = "user";
     const ROLE_MOD   = "mod";
     const ROLE_ADMIN = "admin";
-
 
     // Roles array
     const ROLES = array(
@@ -22,17 +20,17 @@ class User {
     );
 
     // User data
-    public $id;
-    public $username;
-    public $created;
-    public $avatar;
-    public $role;
-    public $banned;
-    public $is_creator;
+    public int $id;
+    public string $username;
+    public int $created;
+    public string $avatar;
+    public string $role;
+    public bool $banned;
+    public bool $is_creator;
     
     // Sensitive data, will not be displayed when serialized
-    private $email;
-    private $passhash;
+    private string $email;
+    private string $passhash;
 
     /**
      * User constructor. It can be constructed in two ways:
@@ -111,6 +109,21 @@ class User {
             $stickers[] = new Sticker($row["sticker_id"]);
         }
         return $stickers;
+    }
+
+    /**
+     * Get the user's albums
+     */
+    public function get_albums() {
+        global $db;
+        $user_id = make_sql_safe($this->id);
+        $sql = "SELECT album_id FROM user_rel_albums WHERE user_id = $user_id";
+        $result = mysqli_query($db, $sql);
+        $albums = array();
+        while ($row = mysqli_fetch_assoc($result)) {
+            $albums[] = new Album($row["album_id"]);
+        }
+        return $albums;
     }
 
     /**

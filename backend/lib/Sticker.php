@@ -19,22 +19,25 @@ require_once("tools.php");
  * 
  * A sticker is visible if it is added to a page in the album, which
  * by default is null.
+ * 
+ * A sticker is revealed (image is visible) if the user has found it
+ * if the user has it once or is the author of the sticker.
  */
 class Sticker {
-    public $id;
-    public $name;
+    public int $id;
+    public ?string $name;
 
-    public $img_path;
-    public $img_path_secret;
+    public string $img_path;
+    public string $img_path_secret;
 
-    public $transform;              // How is the sticker displayed on the page
-    public $user_revealed = false;  // Was this sticker discovered by user?
-    public $obtainable;
+    public array $transform;              // How is the sticker displayed on the page
+    public bool $user_revealed = false;  // Was this sticker discovered by user?
+    public bool $obtainable;
 
-    public $album_id;
-    public $page_id;
-    public $author_id;
-    public $author;
+    public int $album_id;
+    public ?int $page_id;
+    public int $author_id;
+    public User $author;
 
     /**
      * Constructor may take integer id or an
@@ -118,10 +121,10 @@ class Sticker {
 
         // Transform data
         $this->transform = array(
-            "pos_x" => $sticker['pos_x'],
-            "pos_y" => $sticker['pos_y'],
-            "rotation" => $sticker['rotation'],
-            "scale" => $sticker['scale']
+            "pos_x" => (float)$sticker['pos_x'],
+            "pos_y" => (float)$sticker['pos_y'],
+            "rotation" => (float)$sticker['rotation'],
+            "scale" => (float)$sticker['scale']
         );
 
         // Soft check if user revealed sticker
