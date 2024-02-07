@@ -15,6 +15,7 @@ class Album {
     public int $id;
     public string $name;
     public string $description;
+    public bool $is_available;
 
     public User $author;    // A user object
 
@@ -37,6 +38,27 @@ class Album {
     }
 
     /**
+     * Static factory method to create a new Album object
+     * and insert it into the database.
+     * @return Album The created Album object.
+     */
+    public static function create_album(){
+        global $db;
+
+        // Check if user is a creator
+        if(!LoggedUser::get()->is_creator){
+            throw new Exception("You are not a creator, you cannot create new albums!");
+        }
+
+        // Create album
+        $sql = "INSERT INTO albums (author_id, name, description) VALUES (".LoggedUser::get()->id.", '', '')";
+        mysqli_query($db, $sql);
+
+        $album_id = mysqli_insert_id($db);
+        return new Album($album_id);
+    }
+
+    /**
      * Fetch album from database by its ID
      * @param int $album_id of the album
      */
@@ -50,7 +72,7 @@ class Album {
             $sticker_data = mysqli_fetch_assoc($res);
             $this->from_array($sticker_data);
         } else {
-            throw new Exception("Sticker does not exist.");
+            throw new Exception("Album does not exist.");
         }
     }
 
@@ -64,6 +86,7 @@ class Album {
         $this->id = $album["album_id"];
         $this->name = $album["name"];
         $this->description = $album["description"];
+        $this->is_available = $album["available"];
         
         $this->author = new User($album["user_id"]);
         
@@ -76,15 +99,88 @@ class Album {
         }
 
         // Clean up pages, if it's not sequencial or has gaps
-        ksort($this->pages);
-        $this->pages = array_values($this->pages);
-
+        if(!empty($this->pages)){
+            ksort($this->pages);
+            $this->pages = array_values($this->pages);
+        }
+        
         // Load the stickers            
         $this->stickers = array();
         $sql = "SELECT sticker_id FROM stickers WHERE album_id = $this->id";
         $res = mysqli_query($db, $sql);
         while($sticker = mysqli_fetch_assoc($res)){
             array_push($this->stickers, new Sticker($sticker['sticker_id']));
+        }
+    }
+
+    /**
+     * Set album's name
+     */
+    public function set_name($name){
+        global $db;
+        $this->name = make_sql_safe($name);
+
+        $sql = "UPDATE albums SET name = '$this->name' WHERE album_id = $this->id";
+        if(!mysqli_query($db, $sql)){
+            throw new Exception("Rip: ".$db->error);
+        }
+    }
+
+    /**
+     * Set album's description
+     */
+    public function set_desc($desc){
+        global $db;
+        $this->description = make_sql_safe($desc);
+
+        $sql = "UPDATE albums SET description = '$this->description' WHERE album_id = $this->id";
+        if(!mysqli_query($db, $sql)){
+            throw new Exception("Rip: ".$db->error);
+        }
+    }
+
+    /**
+     * Set album's availablity
+     */
+    public function set_availability($status){
+        global $db;
+
+        // Check for requirements before publishing
+        if($status){
+            // If want to publish
+            if($this->name == ""){
+                throw new Exception("Your album must have a name!");
+            }
+
+            if($this->description == ""){
+                throw new Exception("Your album must have at least a short descirption.");
+            }
+
+            if(empty($this->pages)){
+                throw new Exception("Your album must have at least one page");
+            }
+
+            // Check if has at least one sticker on one page
+            $has_placed_sticker = false;
+            foreach ($this->stickers as $id => $s) {
+                if(isset($s->page_id)){
+                    echo "asdf";
+                    $has_placed_sticker = true;
+                }
+            }
+            if(!$has_placed_sticker){
+                throw new Exception("Your album must contain at least one placed sticker");
+            }
+
+            // Set the album as available
+            $this->is_available = true;
+        } else {
+            $this->is_available = false;
+        }
+
+        $sql = "UPDATE albums SET available = $this->is_available WHERE album_id = $this->id";
+        if(!mysqli_query($db, $sql)){
+            throw new Exception("Rip: ".$db->error);
         }
     }
 
@@ -100,9 +196,5 @@ class Album {
         return $print;
     }
 }
-
-$a = new Album(1);
-
-echo $a;
 
 ?>
