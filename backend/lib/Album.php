@@ -20,6 +20,9 @@ class Album {
 
     public array $stickers; // List of the stickers (not loaded by default)
 
+    public int $nb_stickers = 0; // Number of stickers in the album
+    public int $nb_founds = 0;   // Number of found stickers in the album by the user (defualt 0)
+
     /**
      * Constructor may take integer id or an
      * associative array (when bulk object creation
@@ -106,7 +109,17 @@ class Album {
         $sql = "SELECT sticker_id FROM stickers WHERE album_id = $this->id";
         $res = mysqli_query($db, $sql);
         while($sticker = mysqli_fetch_assoc($res)){
+            $this->nb_stickers++;
             array_push($this->stickers, new Sticker($sticker['sticker_id']));
+
+            // Check, if logged in, if the user has found this sticker
+            if(LoggedUser::is_logged()){
+                $sql2 = "SELECT * FROM user_rel_stickers WHERE user_id = ".LoggedUser::get()->id." AND sticker_id = ".$sticker['sticker_id'];
+                $res2 = mysqli_query($db, $sql2);
+                if(mysqli_num_rows($res2) > 0){
+                    $this->nb_founds++;
+                }
+            }
         }
     }
 
