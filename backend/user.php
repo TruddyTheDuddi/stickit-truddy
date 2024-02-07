@@ -86,6 +86,7 @@ class User {
     public $avatar;
     public $role;
     public $banned;
+    public $is_creator;
 
     /**
      * User constructor. It can be constructed in two ways:
@@ -133,6 +134,7 @@ class User {
         $this->avatar = $user["avatar"] ?? self::DEFAULT_AVATAR;
         $this->role = $user["role"];
         $this->banned = $user["banned"];
+        $this->is_creator = $user["is_creator"];
     }
 
     /**

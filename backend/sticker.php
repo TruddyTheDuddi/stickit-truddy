@@ -61,6 +61,11 @@ class Sticker {
         $album_id = make_sql_safe($album_id);
         $author_id = LoggedUser::get()->id;
 
+        // Check if user is a creator
+        if(!LoggedUser::get()->is_creator){
+            throw new Exception("You are not a creator, you cannot create new albums!");
+        }
+
         // Check if user owns this album
         $sql = "SELECT * FROM albums WHERE author_id = $author_id AND album_id = $album_id";
         $res = mysqli_query($db, $sql);
