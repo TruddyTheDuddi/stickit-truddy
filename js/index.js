@@ -71,7 +71,7 @@ let createSteps = {
                 return;
             }
 
-            AJAX.get("backend/api/user/user_create_code.php", {
+            AJAX.get("backend/api/user_create_code.php", {
                 success: (resData) => {
                     if(resData.success){
                         goTo(createSteps.email.next);
@@ -102,7 +102,7 @@ let createSteps = {
             // Add email to data
             data.email = createData.email;
 
-            AJAX.get("backend/api/user/check_code.php", {
+            AJAX.get("backend/api/user_check_code.php", {
                 success: (data) => {
                     if(data.success){
                         goTo(createSteps.codeAndEmail.next);
@@ -135,7 +135,7 @@ let createSteps = {
                 return;
             }
 
-            AJAX.get("backend/api/user/check_code.php", {
+            AJAX.get("backend/api/user_check_code.php", {
                 success: (data) => {
                     if(data.success){
                         goTo(createSteps.codeAndEmail.next);
@@ -194,7 +194,7 @@ let createSteps = {
             data.email = createData.email;
             data.code = createData.code;
 
-            AJAX.get("backend/api/user/user_create_account.php", {
+            AJAX.get("backend/api/user_create_account.php", {
                 success: (data) => {
                     if(data.success){
                         // goTo(createSteps.credentials.next);
@@ -242,7 +242,7 @@ let loginSteps = {
                 return;
             }
 
-            AJAX.get("backend/api/user/user_login.php", {
+            AJAX.get("backend/api/user_login.php", {
                 success: (data) => {
                     if(data.success){
                         console.log(data);
