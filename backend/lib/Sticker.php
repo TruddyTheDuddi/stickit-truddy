@@ -1,7 +1,5 @@
 <?php
 require_once("tools.php");
-require_once("user.php");
-require_once("img.php");
 
 /**
  * A sticker object is built by giving the sticker's ID or an
@@ -36,6 +34,7 @@ class Sticker {
     public $album_id;
     public $page_id;
     public $author_id;
+    public $author;
 
     /**
      * Constructor may take integer id or an
@@ -113,6 +112,7 @@ class Sticker {
         $this->img_path = $sticker["img_path"];
         $this->img_path_secret = $sticker["img_path_secret"];
         $this->author_id = $sticker["author_id"];
+        $this->author = new User($sticker["author_id"]);
         $this->album_id = $sticker["album_id"];
         $this->obtainable = $sticker["obtainable"];
 

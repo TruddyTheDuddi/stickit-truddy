@@ -2,62 +2,6 @@
 require_once("tools.php");
 
 /**
- * Utilty functions on the logged-in user
- */
-class LoggedUser {
-    const SESSION_FIELD = "stickers_logged_user_id";
-
-    /**
-     * Is there a logged user? Doesn't go through the 
-     * user object creation.
-     * @return boolean
-     */
-    public static function is_logged(){
-        return isset($_SESSION[self::SESSION_FIELD]);
-    }
-
-    /**
-     * Get data on the logged in user
-     * @return User object or throws exception if not logged in
-     */
-    public static function get(){
-        // User not logged in
-        if (!LoggedUser::is_logged()) {
-            throw new Exception("User is not logged in.");
-        }
-        $user_id = $_SESSION[self::SESSION_FIELD];
-        return new User($user_id);
-    }
-
-    /**
-     * Set the logged in user
-     * @param int $user_id Target user ID
-     */
-    public static function set($user_id) {
-        $_SESSION[self::SESSION_FIELD] = $user_id;
-    }
-
-    /**
-     * Unset the logged in user (logout)
-     */
-    public static function unset() {
-        unset($_SESSION[self::SESSION_FIELD]);
-    }
-
-    /**
-     * Check the permission of the logged user
-     */
-    public static function is_above($role){
-        $user = self::get();
-        // If user not logged in, no permission
-        if(!isset($user)){
-            return false;
-        }
-        return $user->is_above($role);
-    }
-}
-
-/**
  * Class that resprents a user
  */
 class User {
@@ -80,14 +24,12 @@ class User {
     // User data
     public $id;
     public $username;
-    public $email;
-    public $passhash;
     public $created;
     public $avatar;
     public $role;
     public $banned;
     public $is_creator;
-
+    
     // Sensitive data, will not be displayed when serialized
     private $email;
     private $passhash;
@@ -157,6 +99,21 @@ class User {
     }
 
     /**
+     * Get the user's collected stickers
+     */
+    public function get_stickers() {
+        global $db;
+        $user_id = make_sql_safe($this->id);
+        $sql = "SELECT sticker_id FROM user_rel_stickers WHERE user_id = $user_id";
+        $result = mysqli_query($db, $sql);
+        $stickers = array();
+        while ($row = mysqli_fetch_assoc($result)) {
+            $stickers[] = new Sticker($row["sticker_id"]);
+        }
+        return $stickers;
+    }
+
+    /**
      * Print user data. Cool for debugging.
      */
     public function __toString() {
@@ -172,12 +129,4 @@ class User {
     }
 }
 
-// // Test the class
-// LoggedUser::set(1);
-// $u = LoggedUser::get();
-// if($u == null) {
-//     echo "Not logged in";
-// } else {
-//     echo $u;
-// }
 ?>

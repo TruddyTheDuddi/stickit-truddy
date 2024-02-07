@@ -1,7 +1,5 @@
 <?php
 require_once("tools.php");
-require_once("user.php");
-require_once("sticker.php");
 
 /**
  * Utility class to retrieve albums.

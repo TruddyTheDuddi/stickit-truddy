@@ -1,6 +1,5 @@
 <?php
 require_once("tools.php");
-require_once("user.php");
 
 /**
  * This class performs verification, and manipulations on images.
