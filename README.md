@@ -10,18 +10,31 @@ This website is planned to be hosted as a subdomain on [onacid.net](https://onac
 
 ## Website features
 Here is a list of non-exhaustive features that the website is currently cable of:
+
+- Backend (work in progress feature), containing wrappers for the site's objects (users, albums, stickers, etc) for the DB, and API calls to handle the data from the frontend.
+
 - Main landing page with hero section, website description.
+
 - User account creation process with email verification, user can login.
 
 ## Other utility features
 Some other bits and bobs that are not necessarily content related but more of **utily features** that I've added to the site and that I'm particulary excited with, worth highlighting in this project:
-- New image handling class `backend/img.php` which manipulates images based on paths. Overall the file path manipulations are a lot more clean with this. Uses a tmp system, the callee of the function decides where to put them. Possible DB integration for images in the future?
+
+- Class autoloader and structure file directory. Autoloading happens in `backen/lib/tools.php`, a file that is always inluded in all the backend files (keys, setup DB, json functions, etc).
+
+- New image handling class `backend/lib/Img.php` which manipulates images based on paths. Overall the file path manipulations are a lot more clean with this. Uses a tmp system, the callee of the function decides where to put them. Possible DB integration for images in the future?
+
 - To keep the code clean, classes (usually where DB stuff happens) will rather throw errors instead of stopping execution and set the response success to false. This means it's the callee who'll have to handle the errors properly. This is good because it's less likely that the JSON repsonse will fail.
+
 - Users class that allows to easily manage users, fetch their data, check for permission levels.
+
 - Added sub-page navigation features, which can handle any nav bars, update the URL hash and change the page accordingly. It also handles the browser's back/forward buttons. Can be given custom callbacks to execute when a sub-page is changed.
+
 - Proper API in the backend `backend/api/` that avoid shoving everything in single php files. Instead it rather calls classes and function from other areas that would handle the heavy-lifting logic, while API files would handle the "high-level" logic. This allows to have a modular, consistent accross all API calls, and organized backend with as little duplicate code as possible. (Auth related files yet to be cleaned though)
 - Email sending with proper SMTP.
+
 - Designed advanced and modular input fields (text inputs, checkboxes), with optional icons, descriptions, and is capable of displaying well integrated error messages. Easy to fetch the field's properties such as name, type, values for later usage in forms.
+
 - New ajax queries script handling. Uses `fetch()`, robustly handles successe and error cases that can be customized by the user with callbacks, handles JSON conversion (and possibly failures occuring in the backend).
  
 > [!NOTE]  
@@ -31,10 +44,10 @@ Some other bits and bobs that are not necessarily content related but more of **
 Would you like to run it locally for yourself? The project runs in a basic Apache environments, with PHP (v7.4.33) and MySQL. I use [MAMP](https://www.mamp.info/en/mamp) for that matter because it's been the easiest and most hustle free environment.
 
 ### MySQL db (to be added)
-Import the `backend/sql/booklet.sql` file, which contains the empty tables for the database.
+Import the `backend/config/booklet.sql` file, which contains the empty tables for the database.
 
 ### `keys.php` file
-Additionally you should setup the following variables in `backend/keys.php` which isn't included in the repository.
+Additionally you should setup the following variables in `backend/config/keys.php` which isn't included in the repository.
 
 | Variable | Description |
 |----------|-------------|
@@ -53,8 +66,8 @@ Thanks for anyone supporting me during the making of this project!
 
 Code for sending email is handled by [PHPMailer](https://github.com/PHPMailer/PHPMailer).
 
-Fonts are from their respective creators, and are granted for personal use.
+Fonts are from their respective creators, and are licensed to me for both personal and commercial use.
 
 ---
 > [!IMPORTANT]  
-> This "Stickers Collector" project, including all code, assets, documentation, and other materials, are made by me, [@TruddyTheDuddi](https://github.com/TruddyTheDuddi). While I don't mind you using it for your own personal use or for learning purposes, please do not use it for commercial purposes, nor host it as your own website.
+> This "Stickers Collector" project, including all code, assets, documentation, and other materials, are made by me, [@TruddyTheDuddi](https://github.com/TruddyTheDuddi). While I don't mind you using it for personal learning purposes, please do not use it for commercial ends. Do not host it as your own website.
