@@ -127,7 +127,7 @@ class Sticker {
         // Soft check if user revealed sticker
         if(LoggedUser::is_logged()){
             $user_id = LoggedUser::get()->id;
-            $sql = "SELECT count(*) AS sticker_counts FROM sticker_user_collected WHERE user_id = $user_id AND sticker_id = $this->id";
+            $sql = "SELECT count(*) AS sticker_counts FROM user_rel_stickers WHERE user_id = $user_id AND sticker_id = $this->id";
             $res = mysqli_query($db, $sql);
             $data = mysqli_fetch_assoc($res);
             // User has at least one or is the author
