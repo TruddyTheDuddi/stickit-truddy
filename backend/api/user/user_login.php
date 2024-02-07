@@ -1,6 +1,6 @@
 <?php
-include_once("../../lib/tools.php");
-include_once("../../lib/user.php");
+include_once('../../lib/tools.php');
+include_once('../../lib/user.php');
 $json = new JSON_Resp();
 
 validate_params(array("username", "password"), $_GET);

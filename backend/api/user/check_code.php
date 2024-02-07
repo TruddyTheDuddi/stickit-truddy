@@ -1,5 +1,5 @@
 <?php
-include_once("../../lib/tools.php");
+include_once('../../lib/tools.php');
 $json = new JSON_Resp();
 
 $json->log($_GET);

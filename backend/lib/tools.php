@@ -2,8 +2,8 @@
 // Start session if it hasn't been started
 if (!session_id()) session_start();
 
-require_once("../config/db.php");
-require_once("../config/keys.php");
+require_once(__DIR__ . '/../config/keys.php');
+require_once(__DIR__ . '/../config/db.php');
 
 // Set timezone
 date_default_timezone_set('Europe/Vienna');
@@ -143,5 +143,25 @@ function validate_params($required_params, $request, $sanitize = true) {
     }
     return;
 }
+
+// Define autoloading
+spl_autoload_register(function ($class_name) {
+    // Define an array of directories to look for class files
+    $directories = [
+        '../lib/', // Assuming your classes are directly in the /lib folder
+    ];
+
+    // Replace backslashes in the class name with forward slashes (for namespaces)
+    $class_name = str_replace('\\', '/', $class_name);
+
+    // Check each directory for the class file
+    foreach ($directories as $directory) {
+        $file = __DIR__ . '/' . $directory . $class_name . '.php';
+        if (file_exists($file)) {
+            require_once $file;
+            return; // Stop the loop if the class file is found and included
+        }
+    }
+});
 
 ?>
