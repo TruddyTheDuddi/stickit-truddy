@@ -1,8 +1,7 @@
 <?php
-include_once("tools.php");
-include_once("user.php");
-include_once("img.php");
-include_once("sticker.php");
+require_once("tools.php");
+require_once("user.php");
+require_once("sticker.php");
 
 /**
  * Utility class to retrieve albums.

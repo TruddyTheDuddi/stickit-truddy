@@ -2,13 +2,8 @@
 // Start session if it hasn't been started
 if (!session_id()) session_start();
 
-include_once("keys.php");
-include_once("db_connect.php");
-
-// Picture def
-define("MAX_FILE_SIZE", 10*1000*1000); // 10Mb
-define("ALLOWED_PIC", array('image/png','image/jpg','image/jpeg'));
-define("MAX_FILE_DIM", 2000); // 2000px
+require_once("../config/db.php");
+require_once("../config/keys.php");
 
 // Set timezone
 date_default_timezone_set('Europe/Vienna');

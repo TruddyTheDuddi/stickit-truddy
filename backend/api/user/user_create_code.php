@@ -1,7 +1,7 @@
 <?php
 // Initiate a new user account creation
-include_once("../../tools.php");
-include_once("../../mail.php");
+include_once("../../lib/tools.php");
+include_once("../../lib/mail.php");
 $json = new JSON_Resp();
 
 define("DEBUG", True);

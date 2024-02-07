@@ -1,7 +1,7 @@
 <?php
-include_once("tools.php");
-include_once("user.php");
-include_once("img.php");
+require_once("tools.php");
+require_once("user.php");
+require_once("img.php");
 
 /**
  * A sticker object is built by giving the sticker's ID or an

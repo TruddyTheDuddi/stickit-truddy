@@ -1,5 +1,5 @@
 <?php
-include_once("tools.php");
+require_once("tools.php");
 
 /**
  * Utilty functions on the logged-in user
