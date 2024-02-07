@@ -88,6 +88,10 @@ class User {
     public $banned;
     public $is_creator;
 
+    // Sensitive data, will not be displayed when serialized
+    private $email;
+    private $passhash;
+
     /**
      * User constructor. It can be constructed in two ways:
      *  1. By passing the user ID: if you have the ID already
