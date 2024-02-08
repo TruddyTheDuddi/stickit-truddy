@@ -7,6 +7,7 @@ require_once("tools.php");
  * user has collected a sticker, acts as a Sticker decorator.
  */
 class StickerCollected {
+    public int $id;
     public Sticker $sticker;
     public User $user;
     public bool $is_sticked;
@@ -20,6 +21,8 @@ class StickerCollected {
         global $db;
 
         $rel_id = make_sql_safe($rel_id);
+        $this->id = $rel_id;
+        
         $sql = "SELECT *, UNIX_TIMESTAMP(obtained_time) AS obtained_time FROM user_rel_stickers WHERE rel_id = $rel_id";
         $result = mysqli_query($db, $sql);
         if ($result && mysqli_num_rows($result) > 0) {
@@ -76,12 +79,24 @@ class StickerCollected {
 
     /**
      * Stick a sticker to an album
-     * @param int $rel_id ID of the relationship
      */
-    public static function stick($rel_id) {
+    public function stick() {
         global $db;
-        $rel_id = make_sql_safe($rel_id);
-        $sql = "UPDATE user_rel_stickers SET is_sticked = 1 WHERE rel_id = $rel_id";
+        
+        // Check if logged user is the owner of the sticker
+        if($this->user->id != LoggedUser::get()->id){
+            throw new Exception("You can't stick a sticker that you don't own.");
+        }
+
+        // Check if same sticker is already sticked
+        $sql = "SELECT * FROM user_rel_stickers WHERE user_id = " . $this->user->id . " AND sticker_id = " . $this->sticker->id . " AND is_sticked = 1";
+        $result = mysqli_query($db, $sql);
+        if (mysqli_num_rows($result) > 0) {
+            throw new Exception("This sticker is already sticked to an album.");
+        }
+
+        // Stick the sticker
+        $sql = "UPDATE user_rel_stickers SET is_sticked = 1 WHERE rel_id = " . $this->id;
         mysqli_query($db, $sql);
     }
 
