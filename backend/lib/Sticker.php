@@ -30,9 +30,9 @@ class Sticker {
     public string $img_path;
     public string $img_path_secret;
 
-    public array $transform;              // How is the sticker displayed on the page
-    public bool $user_revealed = false;  // Was this sticker discovered by user?
-    public bool $obtainable;
+    public array $transform;                // How is the sticker displayed on the page
+    public bool $user_revealed = false;     // Was this sticker discovered by user?
+    public bool $obtainable;                // Is this sticker obtainable from packs?
 
     public int $album_id;
     public ?int $page_id;
@@ -127,8 +127,9 @@ class Sticker {
             "scale" => (float)$sticker['scale']
         );
 
-        // Soft check if user revealed sticker
+        // If the user is logged in
         if(LoggedUser::is_logged()){
+            // Soft check if user revealed sticker
             $user_id = LoggedUser::get()->id;
             $sql = "SELECT count(*) AS sticker_counts FROM user_rel_stickers WHERE user_id = $user_id AND sticker_id = $this->id";
             $res = mysqli_query($db, $sql);
@@ -137,6 +138,7 @@ class Sticker {
             if($data['sticker_counts'] > 0 || $this->author_id == $user_id){
                 $this->user_revealed = true;
             }
+            
         }
 
         // If sticker unavailable, remove the img_path
