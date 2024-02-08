@@ -97,21 +97,6 @@ class User {
     }
 
     /**
-     * Get the user's collected stickers
-     */
-    public function get_stickers() {
-        global $db;
-        $user_id = make_sql_safe($this->id);
-        $sql = "SELECT sticker_id FROM user_rel_stickers WHERE user_id = $user_id";
-        $result = mysqli_query($db, $sql);
-        $stickers = array();
-        while ($row = mysqli_fetch_assoc($result)) {
-            $stickers[] = new Sticker($row["sticker_id"]);
-        }
-        return $stickers;
-    }
-
-    /**
      * Get the user's albums
      */
     public function get_albums() {

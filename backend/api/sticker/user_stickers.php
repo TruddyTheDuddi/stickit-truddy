@@ -5,9 +5,8 @@ include_once('../../lib/tools.php');
 $json = new JSON_Resp();
 
 try {
-    $user = LoggedUser::get();
-    $stickers = $user->get_stickers();
-    $json->add_field("stickers", $stickers);
+    $stickers_rel = StickerCollected::get_by_user(LoggedUser::get()->id, false);
+    $json->add_field("stickers", $stickers_rel);
 } catch (Exception $e) {
     $json->error($e->getMessage());
 }
