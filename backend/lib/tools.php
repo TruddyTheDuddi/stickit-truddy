@@ -1,4 +1,14 @@
 <?php
+// This file should be loaded into every php file. It sets up 
+// the environment, such as:
+// - Starting the session if it hasn't been started
+// - Setting the timezone
+// - Loading the database
+// - Loading the keys (DB credentials, SMTP credentials, etc.)
+// - Defining a JSON response class
+// - Defining a function to validate and sanitize parameters
+// - Defining an autoloader for classes
+
 // Start session if it hasn't been started
 if (!session_id()) session_start();
 
@@ -14,6 +24,7 @@ date_default_timezone_set('Europe/Vienna');
  * A response will have the following values:
  * | `success` - Did the request succeed? (true/false)
  * | `msg`     - Field for the main message
+ * | `status`  - A short string justifying the status (such as keywords for frontend)
  * | `payload` - Array of your custom designed fields
  * | `debug`
  *     | `log`     - Array of debug log messages
@@ -26,12 +37,12 @@ date_default_timezone_set('Europe/Vienna');
  * type to application/json. Turn off for debugging
  */
 class JSON_Resp {
-    private $start_time;
-    private $success; // false or true
-    private $status; // a short string justifying the status (for frontend)
-    private $msg;
-    private $debug_log;
-    private $payload;
+    private int $start_time;
+    private bool $success;  // false or true
+    private ?string $status; // a short string justifying the status (for frontend)
+    private string $msg;
+    private array $debug_log;
+    private array $payload;
 
     function __construct($json_header = true){
         if ($json_header) header('Content-Type: application/json');
@@ -148,7 +159,7 @@ function validate_params($required_params, $request, $sanitize = true) {
 spl_autoload_register(function ($class_name) {
     // Define an array of directories to look for class files
     $directories = [
-        '../lib/', // Assuming your classes are directly in the /lib folder
+        '../lib/',
     ];
 
     // Replace backslashes in the class name with forward slashes (for namespaces)
@@ -159,7 +170,7 @@ spl_autoload_register(function ($class_name) {
         $file = __DIR__ . '/' . $directory . $class_name . '.php';
         if (file_exists($file)) {
             require_once $file;
-            return; // Stop the loop if the class file is found and included
+            return;
         }
     }
 });
