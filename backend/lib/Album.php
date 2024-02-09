@@ -204,6 +204,31 @@ class Album {
      * Reorder pages given an ordered array of page IDs
      * @param array $ordered_ids
      */
+    public function reorder_pages($ordered_ids){
+        global $db;
+        $this->can_edit();
+
+        // Check if the array is valid
+        if(count($ordered_ids) != count($this->pages)){
+            throw new Exception("Invalid number of pages");
+        }
+
+        // Check if the array contains all the pages
+        foreach ($this->pages as $page) {
+            if(!in_array($page->page_id, $ordered_ids)){
+                throw new Exception("Invalid page IDs");
+            }
+        }
+
+        // Update the order
+        $i = 1;
+        foreach ($ordered_ids as $id) {
+            $id = make_sql_safe($id);
+            $sql = "UPDATE album_pages SET page_num = $i WHERE page_id = $id";
+            mysqli_query($db, $sql);
+            $i++;
+        }
+    }
 
     public function __toString() {
         $print = "<b>Album:</b><br>";
