@@ -91,36 +91,26 @@ class Album {
         $this->author = new User($album["user_id"]);
         
         // Pages
-        global $db;
-        $sql = "SELECT *, UNIX_TIMESTAMP(P.created) AS created FROM album_pages P WHERE album_id = $this->id";
-        $res = mysqli_query($db, $sql);
-        while($page = mysqli_fetch_assoc($res)){
-            $this->pages[$page['page_num']] = $page;
-        }
-
-        // Clean up pages, if it's not sequencial or has gaps
-        if(!empty($this->pages)){
-            ksort($this->pages);
-            $this->pages = array_values($this->pages);
-        }
+        $this->pages = AlbumPage::get_by_album($this->id);
         
-        // Load the stickers            
-        $this->stickers = array();
-        $sql = "SELECT sticker_id FROM stickers WHERE album_id = $this->id";
-        $res = mysqli_query($db, $sql);
-        while($sticker = mysqli_fetch_assoc($res)){
-            $this->nb_stickers++;
-            array_push($this->stickers, new Sticker($sticker['sticker_id']));
+        // Load the stickers (TODO!)     
+        // global $db;
+        // $this->stickers = array();
+        // $sql = "SELECT sticker_id FROM stickers WHERE album_id = $this->id";
+        // $res = mysqli_query($db, $sql);
+        // while($sticker = mysqli_fetch_assoc($res)){
+        //     $this->nb_stickers++;
+        //     array_push($this->stickers, new Sticker($sticker['sticker_id']));
 
-            // Check, if logged in, if the user has found this sticker
-            if(LoggedUser::is_logged()){
-                $sql2 = "SELECT * FROM user_rel_stickers WHERE user_id = ".LoggedUser::get()->id." AND sticker_id = ".$sticker['sticker_id'];
-                $res2 = mysqli_query($db, $sql2);
-                if(mysqli_num_rows($res2) > 0){
-                    $this->nb_founds++;
-                }
-            }
-        }
+        //     // Check, if logged in, if the user has found this sticker
+        //     if(LoggedUser::is_logged()){
+        //         $sql2 = "SELECT * FROM user_rel_stickers WHERE user_id = ".LoggedUser::get()->id." AND sticker_id = ".$sticker['sticker_id'];
+        //         $res2 = mysqli_query($db, $sql2);
+        //         if(mysqli_num_rows($res2) > 0){
+        //             $this->nb_founds++;
+        //         }
+        //     }
+        // }
     }
 
     /**
@@ -128,6 +118,7 @@ class Album {
      */
     public function set_name($name){
         global $db;
+        $this->can_edit();
         $this->name = make_sql_safe($name);
 
         $sql = "UPDATE albums SET name = '$this->name' WHERE album_id = $this->id";
@@ -141,6 +132,7 @@ class Album {
      */
     public function set_desc($desc){
         global $db;
+        $this->can_edit();
         $this->description = make_sql_safe($desc);
 
         $sql = "UPDATE albums SET description = '$this->description' WHERE album_id = $this->id";
@@ -154,6 +146,9 @@ class Album {
      */
     public function set_availability($status){
         global $db;
+
+        // Check if user has edit permissions
+        $this->can_edit();
 
         // Check for requirements before publishing
         if($status){
@@ -193,6 +188,22 @@ class Album {
             throw new Exception("Rip: ".$db->error);
         }
     }
+
+    /**
+     * Check if user has permissions to edit anything the album
+     * Either a moderator or the album's author. Throws an exception
+     * if not.
+     */
+    public function can_edit(){
+        if(!LoggedUser::get()->is_above(User::ROLE_MOD) && $this->author->id != LoggedUser::get()->id){
+            throw new Exception("You don't have permissions to edit this album.");
+        }
+    }
+
+    /**
+     * Reorder pages given an ordered array of page IDs
+     * @param array $ordered_ids
+     */
 
     public function __toString() {
         $print = "<b>Album:</b><br>";

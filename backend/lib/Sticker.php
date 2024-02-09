@@ -61,20 +61,15 @@ class Sticker {
     public static function create_sticker($album_id) {
         global $db;
         $album_id = make_sql_safe($album_id);
-        $author_id = LoggedUser::get()->id;
 
         // Check if user is a creator
         if(!LoggedUser::get()->is_creator){
             throw new Exception("You are not a creator, you cannot create new albums!");
         }
 
-        // Check if user owns this album
-        $sql = "SELECT * FROM albums WHERE author_id = $author_id AND album_id = $album_id";
-        $res = mysqli_query($db, $sql);
-        $data = mysqli_fetch_assoc($res);
-        if(!isset($data['album_id'])){
-            throw new Exception("This album does not exist or you don't have permissions to edit it.");
-        }
+        // Check if can edit album
+        $album = new Album($album_id);
+        $album->can_edit();
         
         $sql = "INSERT INTO stickers (album_id, img_path, img_path_secret) VALUES ($album_id, '', '')";
         mysqli_query($db, $sql);
@@ -152,7 +147,9 @@ class Sticker {
      * in the Database.
      */
     public function update_transform($pos_x, $pos_y, $rotation, $scale){
-        $this->check_write_perms();
+        // Check perms
+        $album = new Album($this->album_id);
+        $album->can_edit();
 
         // Update data in object
         $this->transform = array(
@@ -182,7 +179,9 @@ class Sticker {
     public function move_to_page($id = null){
         global $db;
 
-        $this->check_write_perms();
+        // Check perms
+        $album = new Album($this->album_id);
+        $album->can_edit();
 
         // Check if sticker has name before able to add to page
         if(!isset($this->name)){
@@ -197,17 +196,12 @@ class Sticker {
         // If id is null, set page to null
         if(isset($id)){
             $id = make_sql_safe($id);
-    
-            // Check if page ID exists
-            $sql = "SELECT * FROM album_pages WHERE page_id = $id AND album_id = $this->album_id";
-            $res = mysqli_query($db, $sql);
-            $data = mysqli_fetch_assoc($res);
-            if(!isset($data['page_id'])){
-                throw new Exception("This page does not exist for this album");
-            }
+
+            // Check if page exists
+            $page = new AlbumPage($id);
     
             // Perform sticker's page update
-            $this->page_id = $id;
+            $this->page_id = $page->page_id;
             $sql = "UPDATE stickers SET page_id = $id WHERE sticker_id = $this->id";
         } else {
             // Perform sticker's page update
@@ -228,7 +222,9 @@ class Sticker {
         global $db;
 
         // Check perms
-        $this->check_write_perms();
+        $album = new Album($this->album_id);
+        $album->can_edit();
+        
         $bool = make_sql_safe((int)$status);
 
         $this->obtainable = $status;
@@ -245,7 +241,8 @@ class Sticker {
         global $db;
 
         // Check perms
-        $this->check_write_perms();
+        $album = new Album($this->album_id);
+        $album->can_edit();
 
         // Upload and create images
         $tmp_sticker = Img::image_process($file);
@@ -275,7 +272,10 @@ class Sticker {
     public function change_name($name){
         global $db;
 
-        $this->check_write_perms();
+        // Check perms
+        $album = new Album($this->album_id);
+        $album->can_edit();
+        
 
         // Update name in database
         $name = make_sql_safe(trim($name));
@@ -291,23 +291,6 @@ class Sticker {
         }
         if(!mysqli_query($db, $sql)){
             throw new Exception("Rip: ".$db->error);
-        }
-    }
-
-    /**
-     * Check permission for modifications to this sticker
-     */
-    private function check_write_perms(){
-        // Is logged user author
-        if(!LoggedUser::is_logged()){
-            throw new Exception("You are not logged in");
-        }
-
-        // Check perms: author or above MOD level
-        if(LoggedUser::get()->id != $this->author_id){
-            if(!LoggedUser::is_above(User::ROLE_MOD)){
-                throw new Exception("User does not have the permissions to access this file.");
-            }
         }
     }
 
