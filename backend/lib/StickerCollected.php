@@ -100,7 +100,7 @@ class StickerCollected {
     public function stick() {
         global $db;
         
-        // Check if logged user is the owner of the sticker
+        // Check if logged user is the owner of the rel
         if($this->user->id != LoggedUser::get()->id){
             throw new Exception("You can't stick a sticker that you don't own.");
         }
@@ -113,6 +113,7 @@ class StickerCollected {
         }
 
         // Stick the sticker
+        $this->is_sticked = true;
         $sql = "UPDATE user_rel_stickers SET is_sticked = 1 WHERE rel_id = " . $this->rel_id;
         mysqli_query($db, $sql);
     }
