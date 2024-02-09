@@ -40,19 +40,18 @@ class StickerCollected {
      * Factory, creates a list of StickerCollected
      * objects given a user ID.
      * @param int $user_id User ID
-     * @param boolean $only_unsticked If true, only return
+     * @param int $album_id Album ID
      * stickers that are not sticked to an album
      */
-    public static function get_by_user($user_id, $only_unsticked = true) {
+    public static function get_by_user($user_id, $album_id = null) {
         global $db;
         $user_id = make_sql_safe($user_id);
         
-        if($only_unsticked){
-            // Get only unsticked stickers
-            $sql = "SELECT * FROM user_rel_stickers WHERE user_id = $user_id AND is_sticked = 0";
+        if ($album_id) {
+            $album_id = make_sql_safe($album_id);
+            $sql = "SELECT * FROM user_rel_stickers WHERE user_id = $user_id AND is_sticked = 0 AND sticker_id IN (SELECT sticker_id FROM stickers WHERE album_id = $album_id)";
         } else {
-            // Get all stickers (sticked and unsticked)
-            $sql = "SELECT * FROM user_rel_stickers WHERE user_id = $user_id";
+            $sql = "SELECT * FROM user_rel_stickers WHERE user_id = $user_id AND is_sticked = 0";
         }
 
         $result = mysqli_query($db, $sql);
