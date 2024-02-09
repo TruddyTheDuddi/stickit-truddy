@@ -10,6 +10,11 @@ $album_id = $_GET["album_id"];
 try {
     $album = new Album($album_id);
     $json->add_field("album", $album);
+
+    // Remove author from all stickers
+    foreach ($album->stickers as $sticker) {
+        unset($sticker->author);
+    }
 } catch (Exception $e) {
     $json->error($e->getMessage());
 }

@@ -90,27 +90,11 @@ class Album {
         
         $this->author = new User($album["user_id"]);
         
-        // Pages
+        // Get Pages
         $this->pages = AlbumPage::get_by_album($this->id);
         
-        // Load the stickers (TODO!)     
-        // global $db;
-        // $this->stickers = array();
-        // $sql = "SELECT sticker_id FROM stickers WHERE album_id = $this->id";
-        // $res = mysqli_query($db, $sql);
-        // while($sticker = mysqli_fetch_assoc($res)){
-        //     $this->nb_stickers++;
-        //     array_push($this->stickers, new Sticker($sticker['sticker_id']));
-
-        //     // Check, if logged in, if the user has found this sticker
-        //     if(LoggedUser::is_logged()){
-        //         $sql2 = "SELECT * FROM user_rel_stickers WHERE user_id = ".LoggedUser::get()->id." AND sticker_id = ".$sticker['sticker_id'];
-        //         $res2 = mysqli_query($db, $sql2);
-        //         if(mysqli_num_rows($res2) > 0){
-        //             $this->nb_founds++;
-        //         }
-        //     }
-        // }
+        // Get Stickers
+        $this->stickers = Sticker::get_by_album($this->id);
     }
 
     /**

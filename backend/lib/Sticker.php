@@ -37,7 +37,6 @@ class Sticker {
 
     public int $album_id;
     public ?int $page_id;
-    public int $author_id;
     public User $author;
 
     /**
@@ -65,7 +64,7 @@ class Sticker {
 
         // Check if user is a creator
         if(!LoggedUser::get()->is_creator){
-            throw new Exception("You are not a creator, you cannot create new albums!");
+            throw new Exception("You are not a creator, you cannot create new stickers!");
         }
 
         // Check if can edit album
@@ -110,7 +109,6 @@ class Sticker {
         $this->name = $sticker["sticker_name"];
         $this->img_path = $sticker["img_path"];
         $this->img_path_secret = $sticker["img_path_secret"];
-        $this->author_id = $sticker["author_id"];
         $this->author = new User($sticker["author_id"]);
         $this->album_id = $sticker["album_id"];
         $this->obtainable = $sticker["obtainable"];
@@ -131,10 +129,9 @@ class Sticker {
             $res = mysqli_query($db, $sql);
             $data = mysqli_fetch_assoc($res);
             // User has at least one or is the author
-            if($data['sticker_counts'] > 0 || $this->author_id == $user_id){
+            if($data['sticker_counts'] > 0 || $this->author->id == $user_id){
                 $this->user_revealed = true;
             }
-            
         }
 
         // Check if sticker has been sticked
@@ -296,6 +293,23 @@ class Sticker {
         if(!mysqli_query($db, $sql)){
             throw new Exception("Rip: ".$db->error);
         }
+    }
+
+    /**
+     * Get stickers by album
+     * @param int $album_id
+     */
+    public static function get_by_album($album_id){
+        global $db;
+        $album_id = make_sql_safe($album_id);
+
+        $sql = "SELECT * FROM stickers WHERE album_id = $album_id";
+        $result = mysqli_query($db, $sql);
+        $stickers = array();
+        while($row = mysqli_fetch_assoc($result)){
+            $stickers[$row['sticker_id']] = new Sticker($row['sticker_id']);
+        }
+        return $stickers;
     }
 
     public function __toString() {
