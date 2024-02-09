@@ -14,14 +14,15 @@ class Album {
     public string $description;
     public bool $is_available;
 
+    public int $nb_stickers = 0; // Number of stickers in the album
+    public int $nb_founds = 0;   // Number of found stickers in the album by the user (defualt 0)
+
     public User $author;    // A user object
 
     public array $pages;    // Index is order, value is ID of the page in DB
 
     public array $stickers; // List of the stickers (not loaded by default)
 
-    public int $nb_stickers = 0; // Number of stickers in the album
-    public int $nb_founds = 0;   // Number of found stickers in the album by the user (defualt 0)
 
     /**
      * Constructor may take integer id or an
@@ -95,6 +96,16 @@ class Album {
         
         // Get Stickers
         $this->stickers = Sticker::get_by_album($this->id);
+
+        // Set nb of stickers
+        $this->nb_stickers = count($this->stickers);
+
+        // Set nb of sticked stickers
+        foreach ($this->stickers as $sticker) {
+            if($sticker->has_sticked){
+                $this->nb_founds++;
+            }
+        }
     }
 
     /**
