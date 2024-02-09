@@ -64,6 +64,20 @@ class StickerCollected {
     }
 
     /**
+     * Checks if a user has sticked a sticker
+     * @param int $sticer_id Sticker ID
+     * @return boolean True if the user has sticked the sticker
+     */
+    public static function has_user_sticked($sticer_id){
+        global $db;
+        $user_id = LoggedUser::get()->id;
+        $sticer_id = make_sql_safe($sticer_id);
+        $sql = "SELECT * FROM user_rel_stickers WHERE user_id = $user_id AND sticker_id = $sticer_id AND is_sticked = 1";
+        $result = mysqli_query($db, $sql);
+        return mysqli_num_rows($result) > 0;
+    }
+
+    /**
      * Create a new relationship between a user and 
      * a sticker and insert it into the database.
      * @param int $user_id User ID

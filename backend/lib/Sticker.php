@@ -32,6 +32,7 @@ class Sticker {
 
     public array $transform;                // How is the sticker displayed on the page
     public bool $user_revealed = false;     // Was this sticker discovered by user?
+    public bool $has_sticked = false;       // Has the user sticked this sticker? (for album rendering)
     public bool $obtainable;                // Is this sticker obtainable from packs?
 
     public int $album_id;
@@ -135,6 +136,9 @@ class Sticker {
             }
             
         }
+
+        // Check if sticker has been sticked
+        $this->has_sticked = StickerCollected::has_user_sticked($this->id);
 
         // If sticker unavailable, remove the img_path
         if(!$this->user_revealed){
