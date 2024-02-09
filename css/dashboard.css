@@ -1,0 +1,106 @@
+@import url('global.css');
+
+body{
+    background-color: var(--bg-paper);
+
+    background-image: url(../img/dot.svg);
+    background-repeat: repeat;
+    background-size: 34px;
+    background-position: top center;
+    padding: 1em;
+}
+
+main{
+    max-width: 800px;
+    margin: auto;
+    display: grid;
+    gap: 1em;
+}
+
+.page{
+    position: relative;
+    background-color: rgba(0,0,0,0.05);
+    aspect-ratio: 1/1.2;
+    max-width: 600px;
+    border-radius: 0.5em;
+    overflow: hidden;
+}
+
+.page.editable{
+    outline: 2px dashed black;
+    overflow: visible;
+}
+
+.page .sticker{
+    position: absolute;
+    user-select: none;
+    transform: translate(-50%, -50%);
+    transition: width 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.page .sticker .sticker-img-holder img{
+    width: 100%;
+    pointer-events: none;
+}
+
+.page .sticker .action{
+    display: none;
+}
+
+/* Editable page */
+.page.editable .sticker .sticker-img-holder{
+    cursor: grab;
+}
+
+.page.editable .sticker:not(.dragging):hover .sticker-img-holder{
+    filter: brightness(0.9);
+}
+
+.page.editable .sticker.dragging{
+    border: 1.7px dashed rgba(0,0,0,0.4);
+    border-radius: 0.25em;
+}
+
+.page.editable .sticker.dragging .sticker-img-holder{
+    cursor: grabbing;
+    opacity: 0.6;
+    filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.4));
+}
+
+.page.editable .sticker .action{
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    gap: 0.5em;
+    opacity: 0;
+    transition: 0.1s;
+    margin: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.page.editable .sticker:hover:not(.dragging) .action{
+    opacity: 1;
+}
+
+.page.editable .sticker .action img{
+    border-radius: 100%;
+    width: 1.5em;
+    height: 1.5em;
+    backdrop-filter: blur(2px);
+    background-color: rgba(255,255,255, 0.7);
+    cursor: pointer;
+    scale: 1;
+    pointer-events: auto;
+}
+
+.page.editable .sticker .action img:hover{
+    opacity: 0.8;
+}
+
+
+.page.editable .sticker .action img:active{
+    scale: 0.9;
+}

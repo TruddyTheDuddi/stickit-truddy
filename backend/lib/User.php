@@ -1,53 +1,16 @@
 <?php
-include_once("tools.php");
-
-/**
- * Utilty functions on the logged-in user
- */
-class LoggedUser {
-    const SESSION_FIELD = "stickers_logged_user_id";
-
-    /**
-     * Get data on the logged in user
-     * @return User object or null if not logged in
-     */
-    public static function get(){
-        // User not logged in
-        if (!isset($_SESSION[self::SESSION_FIELD])) {
-            return null;
-        }
-        $user_id = $_SESSION[self::SESSION_FIELD];
-        return new User($user_id);
-    }
-
-    /**
-     * Set the logged in user
-     * @param int $user_id Target user ID
-     */
-    public static function set($user_id) {
-        $_SESSION[self::SESSION_FIELD] = $user_id;
-    }
-
-    /**
-     * Unset the logged in user (logout)
-     */
-    public static function unset() {
-        unset($_SESSION[self::SESSION_FIELD]);
-    }
-}
+require_once("tools.php");
 
 /**
  * Class that resprents a user
  */
 class User {
-    // Default avatar (no shit! I add too many comments)
     private const DEFAULT_AVATAR = "default.png";
 
     // Roles variables
     const ROLE_USER  = "user";
     const ROLE_MOD   = "mod";
     const ROLE_ADMIN = "admin";
-
 
     // Roles array
     const ROLES = array(
@@ -57,14 +20,17 @@ class User {
     );
 
     // User data
-    public $id;
-    public $username;
-    public $email;
-    public $passhash;
-    public $created;
-    public $avatar;
-    public $role;
-    public $banned;
+    public int $id;
+    public string $username;
+    public int $created;
+    public string $avatar;
+    public string $role;
+    public bool $banned;
+    public bool $is_creator;
+    
+    // Sensitive data, will not be displayed when serialized
+    private string $email;
+    private string $passhash;
 
     /**
      * User constructor. It can be constructed in two ways:
@@ -112,6 +78,7 @@ class User {
         $this->avatar = $user["avatar"] ?? self::DEFAULT_AVATAR;
         $this->role = $user["role"];
         $this->banned = $user["banned"];
+        $this->is_creator = $user["is_creator"];
     }
 
     /**
@@ -130,6 +97,21 @@ class User {
     }
 
     /**
+     * Get the user's albums
+     */
+    public function get_albums() {
+        global $db;
+        $user_id = make_sql_safe($this->id);
+        $sql = "SELECT album_id FROM user_rel_albums WHERE user_id = $user_id";
+        $result = mysqli_query($db, $sql);
+        $albums = array();
+        while ($row = mysqli_fetch_assoc($result)) {
+            $albums[] = new Album($row["album_id"]);
+        }
+        return $albums;
+    }
+
+    /**
      * Print user data. Cool for debugging.
      */
     public function __toString() {
@@ -145,12 +127,4 @@ class User {
     }
 }
 
-// // Test the class
-// LoggedUser::set(1);
-// $u = LoggedUser::get();
-// if($u == null) {
-//     echo "Not logged in";
-// } else {
-//     echo $u;
-// }
 ?>

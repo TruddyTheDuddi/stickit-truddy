@@ -8,7 +8,7 @@
  * 
  * Mail templates are stored in the mail_templates folder.
  */
-require_once('keys.php');
+require_once('tools.php');
 require_once('php_mailer/PHPMailer.php');
 require_once('php_mailer/SMTP.php');
 require_once('php_mailer/Exception.php'); 
@@ -62,7 +62,9 @@ class Mailer{
  * Class EmailTemplates that contains the paths to the email templates
  */
 class EmailTemplates {
-    private const BASE = DOC_ROOT."backend/mail_templates/";
+    private const BASE = DOC_ROOT."backend/templates/mail/";
+
+    // Paths to email templates
     const CONFIRMATION_TEMPLATE = self::BASE."confirm_code.html";
 }
 

@@ -1,5 +1,5 @@
-const PAGE_ROOT = "http://localhost:8888/booklet/";
-const UTILTY_PAGES = {
+export const PAGE_ROOT = "http://localhost:8888/booklet/";
+export const UTILTY_PAGES = {
     "error_404": PAGE_ROOT + "404.html",
 }
 
@@ -26,7 +26,7 @@ function createEl(tag, props) {
  * @param {*} callback to provide that will trigger when page 
  *  changes with the hash as the argument
  */
-function setupNav(callback = null){
+export function setupNav(callback = null){
     let content = {};
     let currentHash = null;
     let setTimeoutId = null;

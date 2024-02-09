@@ -19,7 +19,7 @@
  * If no callbacks are provided, the default success and error will
  * print or throw the result in the console.
  */
-let AJAX = {
+export let AJAX = {
     /**
      * Performs a GET request to the specified URL.
      * @param {*} url 

@@ -1,6 +1,4 @@
 <?php
-include_once("keys.php");
-
 /**
  * General database login called with include
  */

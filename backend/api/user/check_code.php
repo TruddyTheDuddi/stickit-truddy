@@ -1,5 +1,5 @@
 <?php
-include_once("../../tools.php");
+include_once('../../lib/tools.php');
 $json = new JSON_Resp();
 
 $json->log($_GET);
@@ -9,7 +9,7 @@ $email = $_GET["email"];
 $code = $_GET["code"];
 
 // Check code's validity for this email address
-$sql = "SELECT * FROM user_email_confirmation WHERE email = '$email' AND created > (NOW() - INTERVAL 1 DAY) AND attempts < 5";
+$sql = "SELECT * FROM user_email_confirmation WHERE email = '$email' AND created > (NOW() - INTERVAL 1 DAY) AND attempts < 5 AND user_id IS NULL";
 $res = mysqli_query($db, $sql);
 if (mysqli_num_rows($res) == 0) {
     $json->status("email");
@@ -28,7 +28,7 @@ if (mysqli_num_rows($res) == 0) {
     $sql = "UPDATE user_email_confirmation SET attempts = attempts + 1 WHERE email = '$email'";
     $res = mysqli_query($db, $sql);
 
-    // Check if we chould block this code
+    // Check if we should block this code
     $sql = "SELECT * FROM user_email_confirmation WHERE email = '$email' AND attempts >= 5";
     $res = mysqli_query($db, $sql);
     if (mysqli_num_rows($res) > 0) {
