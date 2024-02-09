@@ -7,7 +7,7 @@ require_once("tools.php");
  * user has collected a sticker, acts as a Sticker decorator.
  */
 class StickerCollected {
-    public int $id;
+    public int $rel_id;
     public Sticker $sticker;
     public User $user;
     public bool $is_sticked;
@@ -21,8 +21,8 @@ class StickerCollected {
         global $db;
 
         $rel_id = make_sql_safe($rel_id);
-        $this->id = $rel_id;
-        
+        $this->rel_id = $rel_id;
+
         $sql = "SELECT *, UNIX_TIMESTAMP(obtained_time) AS obtained_time FROM user_rel_stickers WHERE rel_id = $rel_id";
         $result = mysqli_query($db, $sql);
         if ($result && mysqli_num_rows($result) > 0) {
@@ -68,6 +68,7 @@ class StickerCollected {
      * a sticker and insert it into the database.
      * @param int $user_id User ID
      * @param int $sticker_id Sticker ID
+     * @return StickerCollected The created StickerCollected object
      */
     public static function create($user_id, $sticker_id) {
         global $db;
@@ -75,6 +76,9 @@ class StickerCollected {
         $sticker_id = make_sql_safe($sticker_id);
         $sql = "INSERT INTO user_rel_stickers (user_id, sticker_id, obtained_time) VALUES ($user_id, $sticker_id, NOW())";
         mysqli_query($db, $sql);
+
+        $rel_id = mysqli_insert_id($db);
+        return new StickerCollected($rel_id);
     }
 
     /**
@@ -96,7 +100,7 @@ class StickerCollected {
         }
 
         // Stick the sticker
-        $sql = "UPDATE user_rel_stickers SET is_sticked = 1 WHERE rel_id = " . $this->id;
+        $sql = "UPDATE user_rel_stickers SET is_sticked = 1 WHERE rel_id = " . $this->rel_id;
         mysqli_query($db, $sql);
     }
 
